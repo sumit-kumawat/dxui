@@ -28,18 +28,3 @@ sudo chmod -R 755 /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/
 # Ensure Configuration File Ownership & Permissions
 sudo chown wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 sudo chmod 644 /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
-
-# Restart Wazuh Services
-sudo systemctl restart wazuh-manager
-sudo systemctl restart wazuh-dashboard
-
-# Verify Services
-sudo systemctl status wazuh-manager
-sudo systemctl status wazuh-dashboard
-
-# Troubleshooting Commands
-ls -l /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/
-find /usr/share/wazuh-dashboard -type f -name "customization.logo.app.svg"
-find /usr/share/wazuh-dashboard -type f -name "favicon.svg"
-find / -type f -name "30e500f584235c2912f16c790345f966.svg" 2>/dev/null
-find /usr/share/wazuh-dashboard/ -type f -name "index.html"
