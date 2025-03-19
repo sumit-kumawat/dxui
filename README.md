@@ -1,55 +1,61 @@
-# DefendX UI Branding Script
+# DefendX Wazuh Branding Script
 
-This script updates the branding of Wazuh UI to DefendX by replacing logos and ensuring the correct directory permissions.
+## Overview
+This script automates the branding and setup of Wazuh Dashboard to **DefendX**, replacing Wazuh logos, updating configurations, and applying security settings.
 
 ## Features
-- Replaces Wazuh branding with DefendX branding.
-- Downloads the latest DefendX logo assets.
-- Ensures correct file ownership and permissions.
-- Restarts the DefendX dashboard service for changes to take effect.
+✅ Updates system packages & disables IPv6  
+✅ Sets hostname to `DefendX`  
+✅ Downloads and applies DefendX branding assets  
+✅ Replaces Wazuh logos with DefendX logos  
+✅ Configures dashboard title and system banners  
+✅ Ensures correct file ownership and permissions  
+✅ Enables privileged port binding  
+✅ Restarts Wazuh services and clears cache  
+
+## Prerequisites
+- Wazuh Dashboard must be installed.
+- Ensure you have `sudo` privileges.
+- Ensure internet access to download branding assets.
 
 ## Installation & Usage
-
-### Prerequisites
-- A running instance of Wazuh Dashboard.
-- `curl` installed on your system.
-- `sudo` privileges.
-
-### Steps to Execute
-1. Clone the repository:
-   ```sh
+1. **Clone the repository (if applicable) or manually download the script.**
+   ```bash
    git clone https://github.com/sumit-kumawat/wzui.git
    cd wzui
    ```
-2. Make the script executable:
-   ```sh
+
+2. **Make the script executable:**
+   ```bash
    chmod +x wzui-setup.sh
    ```
-3. Run the script:
-   ```sh
+
+3. **Run the script with sudo:**
+   ```bash
    sudo ./wzui-setup.sh
    ```
 
-### Expected Output
-- The script will fetch and replace the Wazuh logo with the DefendX logo.
-- It will check and correct directory permissions.
-- It will restart the Wazuh (DefendX) dashboard service.
-- A confirmation message will be displayed upon successful execution.
+## Branding Changes
+- Replaces Wazuh dashboard logo with **DefendX logo**.
+- Updates **dashboard title** to `DefendX - Unified XDR and SIEM`.
+- Configures **boot logo** and **terminal login banner**.
+- Updates **system hostname** to `defendx`.
 
 ## Troubleshooting
-If the dashboard does not reflect the changes:
-- Clear your browser cache.
-- Manually restart the dashboard:
-  ```sh
-  sudo systemctl restart wazuh-dashboard
-  ```
-- Ensure the logo URLs are accessible.
+If branding does not apply correctly:
+1. Check logs:
+   ```bash
+   sudo journalctl -xe
+   sudo systemctl status wazuh-dashboard
+   ```
+2. Manually clear dashboard cache:
+   ```bash
+   sudo rm -rf /usr/share/wazuh-dashboard/optimize/*
+   sudo systemctl restart wazuh-dashboard
+   ```
 
 ## License
-This script is open-source and can be modified to fit your branding requirements.
+This project is licensed under the **MIT License**.
 
 ## Contact
-For support, reach out via:
-- **Email**: dx-support@conzex.com
-- **Website**: [DefendX](https://www.defendx.io)
-
+For support, contact **dx-support@conzex.com**.
