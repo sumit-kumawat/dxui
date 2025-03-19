@@ -63,7 +63,7 @@ curl -sSL https://github.com/sumit-kumawat/dxui/raw/main/setup.sh | sudo bash
 |----------------|---------------|
 | **Admin User** | `admin`       |
 | **Password**   | `Adm1n@123`   |
-| **Dashboard**  | `http://<server-ip>` |
+| **Dashboard**  | `https://<server-ip>` |
 | **Login**      | `admin` / `admin` |
 
 ---
