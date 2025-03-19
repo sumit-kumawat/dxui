@@ -64,10 +64,18 @@ for location in "${logo_locations[@]}"; do
     if [ -f "$location" ]; then
         sudo cp "$location" "$location.bak"
         echo -e "${YELLOW}✔ Backup created for: $location${RESET}"
+        
+        # Download and replace logo
+        sudo curl -s -o "$location" "$logo_url"
+        sudo chown wazuh:wazuh "$location"
+        sudo chmod 644 "$location"
+
+        # Remove backup after replacement
+        sudo rm -f "$location.bak"
+        echo -e "${GREEN}✔ Logo updated and backup removed for: $location${RESET}"
+    else
+        echo -e "${RED}✖ Logo file not found: $location, skipping...${RESET}"
     fi
-    sudo curl -s -o "$location" "$logo_url"
-    sudo chown wazuh:wazuh "$location"
-    sudo chmod 644 "$location"
 done
 echo -e "${GREEN}✔ Logo replacement completed!${RESET}"
 
@@ -77,9 +85,16 @@ sudo sed -i '/opensearchDashboards.branding:/,/applicationTitle:/d' /etc/wazuh-d
 sudo bash -c 'echo -e "opensearchDashboards.branding:\n  applicationTitle: \"DefendX - Unified XDR and SIEM\"" >> /etc/wazuh-dashboard/opensearch_dashboards.yml'
 echo -e "${GREEN}✔ Dashboard branding updated successfully!${RESET}"
 
+# Clear Wazuh Dashboard Cache
+echo -e "${BLUE}Clearing Wazuh Dashboard cache...${RESET}"
+sudo rm -rf /usr/share/wazuh-dashboard/data/*
+sudo systemctl restart wazuh-dashboard
+echo -e "${GREEN}✔ Cache cleared successfully!${RESET}"
+
 # Update Boot Logo
 echo -e "${BLUE}Updating Boot Logo...${RESET}"
-sudo curl -s -o /boot/grub2/defendx.png https://cdn.conzex.com/uploads/Defendx-Assets/defendx.png
+boot_logo_url="https://cdn.conzex.com/uploads/Defendx-Assets/defendx.png"
+sudo curl -s -o /boot/grub2/defendx.png "$boot_logo_url"
 sudo sed -i 's|^GRUB_BACKGROUND=.*|GRUB_BACKGROUND="/boot/grub2/defendx.png"|' /etc/default/grub
 sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 echo -e "${GREEN}✔ Boot logo updated!${RESET}"
