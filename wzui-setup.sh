@@ -47,6 +47,29 @@ fetch_files() {
     show_progress $!
 }
 
+# Function to replace logos
+replace_logo() {
+    local logo_url="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"
+    local locations=(
+        "/usr/share/wazuh-dashboard/plugins/securityDashboards/target/public/30e500f584235c2912f16c790345f966.svg"
+        "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/30e500f584235c2912f16c790345f966.svg"
+    )
+
+    for location in "${locations[@]}"; do
+        if [ -f "$location" ]; then
+            sudo cp "$location" "$location.bak"
+            echo -e "${YELLOW}✔ Backup created for:${RESET} $location"
+        fi
+
+        echo -e "${BLUE}Replacing logo in:${RESET} $location"
+        sudo curl -s -o "$location" "$logo_url"
+
+        # Set correct ownership and permissions
+        sudo chown wazuh:wazuh "$location"
+        sudo chmod 644 "$location"
+    done
+}
+
 # System Preparation
 echo -e "${BLUE}Updating System...${RESET}"
 sudo yum update -y & show_progress $!
@@ -71,9 +94,12 @@ check_and_create_dir "/usr/share/wazuh-dashboard/data/wazuh/downloads" "wazuh-da
 fetch_files "https://cdn.conzex.com/?path=%2FDefendx-Assets%2FCustom+branding" "/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/"
 fetch_files "https://cdn.conzex.com/?path=%2FDefendx-Assets%2FWazuh-assets" "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/"
 
-# Change Ownership & Permissions for Defendx Dashboard
+# Replace Wazuh logos with DefendX logos
+replace_logo
+
+# Change Ownership & Permissions for Wazuh Dashboard
 echo -e "${BLUE}Setting ownership for Wazuh Dashboard...${RESET}"
-sudo chown -R admin:admin /usr/share/wazuh-dashboard
+sudo chown -R wazuh:wazuh /usr/share/wazuh-dashboard
 sudo chmod -R 775 /usr/share/wazuh-dashboard
 
 # Allow Binding to Privileged Ports
@@ -90,7 +116,7 @@ done
 
 # Set Web Title
 echo -e "${BLUE}Setting Dashboard Title...${RESET}"
-sudo sed -i '/opensearchDashboards.branding:/a applicationTitle: "Defendx - Unified XDR and SIEM"' /etc/wazuh-dashboard/opensearch_dashboards.yml
+sudo sed -i '/opensearchDashboards.branding:/a applicationTitle: "DefendX - Unified XDR and SIEM"' /etc/wazuh-dashboard/opensearch_dashboards.yml
 
 # Update Hosts File for Web Access
 echo -e "${BLUE}Updating Hosts File...${RESET}"
@@ -119,4 +145,4 @@ find /usr/share/wazuh-dashboard -type f -name "favicon.svg"
 find /usr/share/wazuh-dashboard/ -type f -name "wazuh_agent.c"
 
 # Completion Message
-echo -e "${GREEN}✔ Defendx Dashboard setup & branding completed successfully!${RESET}"
+echo -e "${GREEN}✔ DefendX Dashboard setup & branding completed successfully!${RESET}"
