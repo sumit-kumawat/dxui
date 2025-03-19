@@ -22,7 +22,7 @@ This script automates the branding and setup of the security dashboard to **Defe
 1. **Clone the repository (if applicable) or manually download the script.**
    ```bash
    git clone https://github.com/sumit-kumawat/dxui.git
-   cd wzui
+   cd dxui
    ```
 
 2. **Make the script executable:**
