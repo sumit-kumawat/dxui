@@ -21,8 +21,8 @@ This script automates the setup and configuration of the Wazuh Dashboard, includ
 ### 1. Download the Script:
 Run the following command to download the script from GitHub:
 
-```bash
-curl -O curl -O https://raw.githubusercontent.com/sumit-kumawat/wzui/main/setup.sh
+```ba
+curl -O https://raw.githubusercontent.com/sumit-kumawat/wzui/main/setup.sh
 ```
 
 ```bash
