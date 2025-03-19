@@ -22,7 +22,7 @@ This script automates the setup and configuration of the Wazuh Dashboard, includ
 Run the following command to download the script from GitHub:
 
 ```ba
-curl -O https://raw.githubusercontent.com/sumit-kumawat/wzui/main/setup.sh
+curl -O https://raw.githubusercontent.com/sumit-kumawat/wzui/main/wzui-setup.sh
 ```
 
 ```bash
