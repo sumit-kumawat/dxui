@@ -70,7 +70,7 @@ sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard
 
 📖 Documentation: [docs.conzex.com/defendx](https://docs.conzex.com/defendx)  
 🌐 Website: [www.conzex.com](https://www.conzex.com)  
-📧 Email: [defendx-support@conzex.com](defendx-support@conzex.com)
+📧 Email: [defendx-support@conzex.com](mailto:defendx-support@conzex.com)
 
 ---
 
