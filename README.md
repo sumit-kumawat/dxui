@@ -2,7 +2,7 @@
 
 **A powerful and secure setup script for rebranding Wazuh into DefendX.**
 
-![DefendX](https://cdn.conzex.com/uploads/Defendx-Assets/defendx-banner.png)
+![DefendX](https://cdn.conzex.com/uploads/LOGO-SVG/cz-light.svg)
 
 ---
 
