@@ -35,26 +35,6 @@ Run the following commands to set up **DefendX** on your Wazuh instance:
 sudo apt update && sudo apt install -y curl
 curl -sSL https://github.com/sumit-kumawat/dxui/raw/main/setup.sh | sudo bash
 ```
-
----
-
-## 🎨 **Branding Customizations**
-
-### 🔹 **Login Banner** (`/etc/issue`)
-
-```text
-🔹 Welcome to DefendX – Unified XDR & SIEM 🔹
-📖 Documentation: docs.conzex.com/defendx
-🌐 Website: www.conzex.com
-📧 Support: defendx-support@conzex.com
-```
-
-### 🔹 **Dashboard Branding**
-
-- **Application Title:** "DefendX - Unified XDR and SIEM"
-- **Logo URL:** [DefendX Logo](https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg)
-- **Boot Splash:** [DefendX Boot Image](https://cdn.conzex.com/uploads/Defendx-Assets/defendx.png)
-
 ---
 
 ## 🔑 **Default Credentials**
