@@ -128,10 +128,6 @@ sudo curl -s -o /boot/grub2/defendx.png https://cdn.conzex.com/uploads/Defendx-A
 sudo sed -i 's|^GRUB_BACKGROUND=.*|GRUB_BACKGROUND="/boot/grub2/defendx.png"|' /etc/default/grub
 sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 
-# Set Terminal Login Banner (MOTD)
-echo -e "${BLUE}Setting Terminal Banner...${RESET}"
-sudo bash -c 'figlet -f big "DefendX" > /etc/motd'
-
 # Clear Cache & Restart Dashboard
 echo -e "${BLUE}Clearing Cache and Restarting Dashboard...${RESET}"
 sudo rm -rf /usr/share/wazuh-dashboard/optimize/*
