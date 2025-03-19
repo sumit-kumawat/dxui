@@ -1,4 +1,4 @@
-# 🚀 **DefendX - Unified XDR & SIEM**
+# **DefendX - Unified XDR & SIEM**
 
 **A powerful and secure setup script for rebranding Wazuh into DefendX.**
 
