@@ -84,7 +84,7 @@ sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 echo -e "${BLUE}Setting hostname to:${RESET} DefendX"
 sudo hostnamectl set-hostname defendx
 
-# Ensure all required directories exist with proper permissions
+# Ensure required directories exist
 check_and_create_dir "/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images" "wazuh:wazuh" "755"
 check_and_create_dir "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/" "wazuh:wazuh" "755"
 check_and_create_dir "/usr/share/wazuh-dashboard/data/wazuh/config" "wazuh-dashboard:wazuh-dashboard" "644"
@@ -94,35 +94,31 @@ check_and_create_dir "/usr/share/wazuh-dashboard/data/wazuh/downloads" "wazuh-da
 fetch_files "https://cdn.conzex.com/?path=%2FDefendx-Assets%2FCustom+branding" "/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/"
 fetch_files "https://cdn.conzex.com/?path=%2FDefendx-Assets%2FWazuh-assets" "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/"
 
-# Replace Wazuh logos with DefendX logos
+# Replace Wazuh logos
 replace_logo
 
-# Change Ownership & Permissions for Wazuh Dashboard
+# Set correct permissions
 echo -e "${BLUE}Setting ownership for Wazuh Dashboard...${RESET}"
 sudo chown -R wazuh:wazuh /usr/share/wazuh-dashboard
 sudo chmod -R 775 /usr/share/wazuh-dashboard
 
-# Allow Binding to Privileged Ports
-echo -e "${BLUE}Enabling port bindings...${RESET}"
-sudo setcap 'cap_net_bind_service=+ep' /usr/share/wazuh-dashboard/bin/opensearch-dashboards
-sudo setcap 'cap_net_bind_service=+ep' /usr/share/wazuh-dashboard/node/fallback/bin/node
-
-# Restart Wazuh Services
-echo -e "${BLUE}Restarting Wazuh Services...${RESET}"
+# Enable and start services on boot
 for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
+    sudo systemctl enable $service
     sudo systemctl restart $service
     sudo systemctl status $service --no-pager
 done
 
-# Set Web Title
-echo -e "${BLUE}Setting Dashboard Title...${RESET}"
-sudo sed -i '/opensearchDashboards.branding:/a applicationTitle: "DefendX - Unified XDR and SIEM"' /etc/wazuh-dashboard/opensearch_dashboards.yml
+# Update branding in Wazuh Dashboard configuration
+echo -e "${BLUE}Updating Dashboard Branding...${RESET}"
+sudo sed -i '/opensearchDashboards.branding:/,/applicationTitle:/d' /etc/wazuh-dashboard/opensearch_dashboards.yml
+sudo bash -c 'echo -e "opensearchDashboards.branding:\n  applicationTitle: \"DefendX - Unified XDR and SIEM\"" >> /etc/wazuh-dashboard/opensearch_dashboards.yml'
 
-# Update Hosts File for Web Access
+# Update Hosts File
 echo -e "${BLUE}Updating Hosts File...${RESET}"
 sudo bash -c 'echo -e "127.0.0.1   defendx\n::1         defend" >> /etc/hosts'
 
-# Update Boot-up Text & Logo
+# Update Boot Logo
 echo -e "${BLUE}Updating Boot Logo...${RESET}"
 sudo curl -s -o /boot/grub2/defendx.png https://cdn.conzex.com/uploads/Defendx-Assets/defendx.png
 sudo sed -i 's|^GRUB_BACKGROUND=.*|GRUB_BACKGROUND="/boot/grub2/defendx.png"|' /etc/default/grub
@@ -132,13 +128,6 @@ sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 echo -e "${BLUE}Clearing Cache and Restarting Dashboard...${RESET}"
 sudo rm -rf /usr/share/wazuh-dashboard/optimize/*
 sudo systemctl restart wazuh-dashboard
-
-# Troubleshooting Commands
-echo -e "${YELLOW}Verifying Branding Files...${RESET}"
-ls -l /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/
-find /usr/share/wazuh-dashboard -type f -name "customization.logo.app.svg"
-find /usr/share/wazuh-dashboard -type f -name "favicon.svg"
-find /usr/share/wazuh-dashboard/ -type f -name "wazuh_agent.c"
 
 # Completion Message
 echo -e "${GREEN}✔ DefendX Dashboard setup & branding completed successfully!${RESET}"
