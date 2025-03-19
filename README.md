@@ -1,68 +1,98 @@
-# DefendX Branding Script
+# 🚀 **DefendX - Unified XDR & SIEM**
 
-## Overview
-This script automates the branding and setup of the security dashboard to **DefendX**, replacing existing logos, updating configurations, and applying security settings.
+**A powerful and secure setup script for rebranding Wazuh into DefendX.**
 
-## Features
-✅ Creates an `admin` user with sudo privileges  
-✅ Transfers ownership of `wazuh-user` files to `admin`  
-✅ Removes the `wazuh-user` if it exists  
-✅ Updates `/etc/issue` with **DefendX branding**  
-✅ Sets hostname to `DefendX`  
-✅ Updates hosts file for correct resolution  
-✅ Replaces existing logos with **DefendX logos**  
-✅ Configures dashboard title and system banners  
-✅ Updates boot logo to **DefendX branding**  
-✅ Ensures correct file ownership and permissions  
-✅ Restarts necessary services  
-✅ Displays login credentials and access URLs after completion  
+![DefendX](https://cdn.conzex.com/uploads/Defendx-Assets/defendx-banner.png)
 
-## Prerequisites
-- Wazuh security dashboard must be installed.
-- Ensure you have `sudo` privileges.
-- Ensure internet access to download branding assets.
+---
 
-## Installation & Usage
-1. **Clone the repository (if applicable) or manually download the script.**
-   ```bash
-   git clone https://github.com/sumit-kumawat/dxui.git
-   cd dxui
-   ```
+## 📌 **Features**
 
-2. **Make the script executable:**
-   ```bash
-   chmod +x setup.sh
-   ```
+✅ Creates an `admin` user with sudo privileges.  
+✅ Rebrands Wazuh with **DefendX** logos and branding.  
+✅ Updates `/etc/issue` with custom branding details.  
+✅ Changes hostname to `DefendX` and updates `/etc/hosts`.  
+✅ Replaces **Wazuh Dashboard** branding.  
+✅ Updates **boot logo** with DefendX branding.  
+✅ Restarts all necessary Wazuh services after configuration.  
 
-3. **Run the script with sudo:**
-   ```bash
-   sudo ./setup.sh
-   ```
+---
 
-## Branding Changes
-- Creates an `admin` user with predefined credentials.
-- Transfers all files owned by `wazuh-user` to `admin` and removes `wazuh-user`.
-- Replaces existing dashboard logo with **DefendX logo**.
-- Updates **dashboard title** to `DefendX - Unified XDR and SIEM`.
-- Configures **boot logo** and **terminal login banner**.
-- Updates **system hostname** to `defendx`.
-- Ensures all services are restarted and enabled for persistence.
+## 📜 **Prerequisites**
 
-## Troubleshooting
-If branding does not apply correctly:
-1. Check logs:
-   ```bash
-   sudo journalctl -xe
-   sudo systemctl status wazuh-dashboard
-   ```
-2. Manually clear dashboard cache:
-   ```bash
-   sudo rm -rf /usr/share/wazuh-dashboard/optimize/*
-   sudo systemctl restart wazuh-dashboard
-   ```
+Ensure your system has:
+- A fresh **Wazuh installation**
+- Internet access for downloading assets
+- Root or sudo privileges
 
-## License
-This project is licensed under the **MIT License**.
+---
 
-## Contact
-For support, contact **defendx-support@conzex.com**.
+## 🛠 **Installation & Usage**
+
+Run the following commands to set up **DefendX** on your Wazuh instance:
+
+```bash
+sudo apt update && sudo apt install -y curl
+curl -sSL https://github.com/sumit-kumawat/dxui/raw/main/setup.sh | sudo bash
+```
+
+---
+
+## 🎨 **Branding Customizations**
+
+### 🔹 **Login Banner** (`/etc/issue`)
+
+```text
+🔹 Welcome to DefendX – Unified XDR & SIEM 🔹
+📖 Documentation: docs.conzex.com/defendx
+🌐 Website: www.conzex.com
+📧 Support: defendx-support@conzex.com
+```
+
+### 🔹 **Dashboard Branding**
+
+- **Application Title:** "DefendX - Unified XDR and SIEM"
+- **Logo URL:** [DefendX Logo](https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg)
+- **Boot Splash:** [DefendX Boot Image](https://cdn.conzex.com/uploads/Defendx-Assets/defendx.png)
+
+---
+
+## 🔑 **Default Credentials**
+
+| Parameter       | Value          |
+|----------------|---------------|
+| **Admin User** | `admin`       |
+| **Password**   | `Adm1n@123`   |
+| **Dashboard**  | `http://<server-ip>` |
+| **Login**      | `admin` / `admin` |
+
+---
+
+## 🔄 **Restart Wazuh Services**
+
+If needed, restart Wazuh services manually:
+
+```bash
+sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard
+```
+
+---
+
+## 🛡 **Security & Hardening**
+
+- Change the default password **immediately after setup**.
+- Restrict SSH access with a firewall.
+- Enable automatic security updates.
+
+---
+
+## 📧 **Support & Contact**
+
+📖 Documentation: [docs.conzex.com/defendx](https://docs.conzex.com/defendx)  
+🌐 Website: [www.conzex.com](https://www.conzex.com)  
+📧 Email: `defendx-support@conzex.com`  
+
+---
+
+🚀 **Enjoy enhanced security and monitoring with DefendX!** 🔥
+
