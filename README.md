@@ -4,17 +4,21 @@
 This script automates the branding and setup of the security dashboard to **DefendX**, replacing existing logos, updating configurations, and applying security settings.
 
 ## Features
-✅ Updates system packages & disables IPv6  
+✅ Creates an `admin` user with sudo privileges  
+✅ Transfers ownership of `wazuh-user` files to `admin`  
+✅ Removes the `wazuh-user` if it exists  
+✅ Updates `/etc/issue` with **DefendX branding**  
 ✅ Sets hostname to `DefendX`  
-✅ Downloads and applies DefendX branding assets  
-✅ Replaces existing logos with DefendX logos  
+✅ Updates hosts file for correct resolution  
+✅ Replaces existing logos with **DefendX logos**  
 ✅ Configures dashboard title and system banners  
+✅ Updates boot logo to **DefendX branding**  
 ✅ Ensures correct file ownership and permissions  
-✅ Enables privileged port binding  
-✅ Restarts services and clears cache  
+✅ Restarts necessary services  
+✅ Displays login credentials and access URLs after completion  
 
 ## Prerequisites
-- The security dashboard must be installed.
+- Wazuh security dashboard must be installed.
 - Ensure you have `sudo` privileges.
 - Ensure internet access to download branding assets.
 
@@ -36,22 +40,25 @@ This script automates the branding and setup of the security dashboard to **Defe
    ```
 
 ## Branding Changes
+- Creates an `admin` user with predefined credentials.
+- Transfers all files owned by `wazuh-user` to `admin` and removes `wazuh-user`.
 - Replaces existing dashboard logo with **DefendX logo**.
 - Updates **dashboard title** to `DefendX - Unified XDR and SIEM`.
 - Configures **boot logo** and **terminal login banner**.
 - Updates **system hostname** to `defendx`.
+- Ensures all services are restarted and enabled for persistence.
 
 ## Troubleshooting
 If branding does not apply correctly:
 1. Check logs:
    ```bash
    sudo journalctl -xe
-   sudo systemctl status dashboard-service
+   sudo systemctl status wazuh-dashboard
    ```
 2. Manually clear dashboard cache:
    ```bash
-   sudo rm -rf /usr/share/dashboard/optimize/*
-   sudo systemctl restart dashboard-service
+   sudo rm -rf /usr/share/wazuh-dashboard/optimize/*
+   sudo systemctl restart wazuh-dashboard
    ```
 
 ## License
