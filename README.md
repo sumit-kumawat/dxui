@@ -58,4 +58,4 @@ If branding does not apply correctly:
 This project is licensed under the **MIT License**.
 
 ## Contact
-For support, contact **dx-support@conzex.com**.
+For support, contact **defendx-support@conzex.com**.
