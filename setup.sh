@@ -38,13 +38,25 @@ check_and_create_dir() {
     sudo chmod -R "$permissions" "$dir"
 }
 
-# Function to download files from a URL and preserve names
-fetch_files() {
-    local url=$1
-    local destination=$2
-    echo -e "${BLUE}Downloading files from:${RESET} $url"
-    wget -q --show-progress -r -np -nH --cut-dirs=3 -R "index.html*" "$url" -P "$destination" &
-    show_progress $!
+# Function to update /etc/issue with custom DefendX banner
+update_issue_banner() {
+    echo -e "${BLUE}Updating /etc/issue with DefendX branding...${RESET}"
+    sudo bash -c 'cat << EOF > /etc/issue
+🔹 Welcome to DefendX – Unified XDR & SIEM 🔹
+
+📖 Documentation: docs.conzex.com/defendx
+🌐 Website: www.conzex.com
+📧 Support: defendx-support@conzex.com
+_____________________________________________
+
+🔑 Login Credentials:
+
+👤 User: admin
+🔒 Password: Adm1n@123
+_____________________________________________
+
+EOF'
+    echo -e "${GREEN}✔ /etc/issue updated successfully!${RESET}"
 }
 
 # Function to replace logos
@@ -90,15 +102,11 @@ check_and_create_dir "/usr/share/wazuh-dashboard/src/core/server/core_app/assets
 check_and_create_dir "/usr/share/wazuh-dashboard/data/wazuh/config" "wazuh-dashboard:wazuh-dashboard" "644"
 check_and_create_dir "/usr/share/wazuh-dashboard/data/wazuh/downloads" "wazuh-dashboard:wazuh-dashboard" "775"
 
-# Fetch branding assets
-fetch_files "https://cdn.conzex.com/?path=%2FDefendx-Assets%2FCustom+branding" "/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/"
-fetch_files "https://cdn.conzex.com/?path=%2FDefendx-Assets%2FWazuh-assets" "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/"
-
-# Replace Defendx logos
-replace_logo
+# Update login banner
+update_issue_banner
 
 # Set correct permissions
-echo -e "${BLUE}Setting ownership for Defendx Dashboard...${RESET}"
+echo -e "${BLUE}Setting ownership for DefendX Dashboard...${RESET}"
 sudo chown -R wazuh:wazuh /usr/share/wazuh-dashboard
 sudo chmod -R 775 /usr/share/wazuh-dashboard
 
@@ -109,7 +117,7 @@ for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     sudo systemctl status $service --no-pager
 done
 
-# Update branding in Defendx Dashboard configuration
+# Update branding in DefendX Dashboard configuration
 echo -e "${BLUE}Updating Dashboard Branding...${RESET}"
 sudo sed -i '/opensearchDashboards.branding:/,/applicationTitle:/d' /etc/wazuh-dashboard/opensearch_dashboards.yml
 sudo bash -c 'echo -e "opensearchDashboards.branding:\n  applicationTitle: \"DefendX - Unified XDR and SIEM\"" >> /etc/wazuh-dashboard/opensearch_dashboards.yml'
