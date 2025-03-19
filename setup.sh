@@ -94,11 +94,11 @@ check_and_create_dir "/usr/share/wazuh-dashboard/data/wazuh/downloads" "wazuh-da
 fetch_files "https://cdn.conzex.com/?path=%2FDefendx-Assets%2FCustom+branding" "/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/"
 fetch_files "https://cdn.conzex.com/?path=%2FDefendx-Assets%2FWazuh-assets" "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/"
 
-# Replace Wazuh logos
+# Replace Defendx logos
 replace_logo
 
 # Set correct permissions
-echo -e "${BLUE}Setting ownership for Wazuh Dashboard...${RESET}"
+echo -e "${BLUE}Setting ownership for Defendx Dashboard...${RESET}"
 sudo chown -R wazuh:wazuh /usr/share/wazuh-dashboard
 sudo chmod -R 775 /usr/share/wazuh-dashboard
 
@@ -109,7 +109,7 @@ for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     sudo systemctl status $service --no-pager
 done
 
-# Update branding in Wazuh Dashboard configuration
+# Update branding in Defendx Dashboard configuration
 echo -e "${BLUE}Updating Dashboard Branding...${RESET}"
 sudo sed -i '/opensearchDashboards.branding:/,/applicationTitle:/d' /etc/wazuh-dashboard/opensearch_dashboards.yml
 sudo bash -c 'echo -e "opensearchDashboards.branding:\n  applicationTitle: \"DefendX - Unified XDR and SIEM\"" >> /etc/wazuh-dashboard/opensearch_dashboards.yml'
