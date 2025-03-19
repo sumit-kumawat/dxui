@@ -1,112 +1,122 @@
-# Wazuh Dashboard Setup & Configuration Guide
+#!/bin/bash
 
-## Table of Contents
-- [System Preparation](#system-preparation)
-- [Setting Hostname](#setting-hostname)
-- [Configuring Wazuh Dashboard Permissions](#configuring-wazuh-dashboard-permissions)
-- [Managing Custom Logo for Wazuh Dashboard](#managing-custom-logo-for-wazuh-dashboard)
-- [Configuring Wazuh Configuration File](#configuring-wazuh-configuration-file)
-- [Restarting Wazuh Services](#restarting-wazuh-services)
-- [Custom Branding (Title, Hostname, Boot, Banner)](#custom-branding-title-hostname-boot-banner)
-- [Clearing Cache](#clearing-cache)
-- [Troubleshooting Commands](#troubleshooting-commands)
+set -e  # Exit immediately if a command exits with a non-zero status
 
----
+# Define Colors
+GREEN="\e[32m"
+BLUE="\e[34m"
+RED="\e[31m"
+YELLOW="\e[33m"
+RESET="\e[0m"
 
-## System Preparation
-```bash
-# Update system packages & disable IPv6 in one step
-sudo yum update -y && sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
-    && sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 \
-    && sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
-```
+# Progress Bar Function
+show_progress() {
+    local pid=$1
+    local delay=0.1
+    local spin='|/-\'
+    while ps -p $pid > /dev/null; do
+        local i=$(( (i+1) %4 ))
+        printf "\r${YELLOW}Processing... ${spin:$i:1}${RESET}"
+        sleep $delay
+    done
+    printf "\r${GREEN}✔ Done!${RESET}\n"
+}
 
----
+# Function to check and create directories with correct permissions
+check_and_create_dir() {
+    local dir=$1
+    local owner=$2
+    local permissions=$3
+    echo -e "${BLUE}Checking directory:${RESET} $dir"
+    if [ ! -d "$dir" ]; then
+        sudo mkdir -p "$dir"
+        echo -e "${GREEN}✔ Created:${RESET} $dir"
+    else
+        echo -e "${YELLOW}✔ Already Exists:${RESET} $dir"
+    fi
+    sudo chown -R "$owner" "$dir"
+    sudo chmod -R "$permissions" "$dir"
+}
 
-## Setting Hostname
-```bash
+# Function to download files from a URL and preserve names
+fetch_files() {
+    local url=$1
+    local destination=$2
+    echo -e "${BLUE}Downloading files from:${RESET} $url"
+    wget -q --show-progress -r -np -nH --cut-dirs=3 -R "index.html*" "$url" -P "$destination" &
+    show_progress $!
+}
+
+# System Preparation
+echo -e "${BLUE}Updating System...${RESET}"
+sudo yum update -y & show_progress $!
+
+# Disable IPv6
+echo -e "${BLUE}Disabling IPv6...${RESET}"
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
+# Set Hostname
+echo -e "${BLUE}Setting hostname to:${RESET} DefendX"
 sudo hostnamectl set-hostname defendx
-```
 
----
+# Ensure all required directories exist with proper permissions
+check_and_create_dir "/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images" "wazuh:wazuh" "755"
+check_and_create_dir "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/" "wazuh:wazuh" "755"
+check_and_create_dir "/usr/share/wazuh-dashboard/data/wazuh/config" "wazuh-dashboard:wazuh-dashboard" "644"
+check_and_create_dir "/usr/share/wazuh-dashboard/data/wazuh/downloads" "wazuh-dashboard:wazuh-dashboard" "775"
 
-## Configuring Wazuh Dashboard Permissions
-```bash
-# Set ownership & permissions for Wazuh Dashboard
-sudo chown -R admin:admin /usr/share/wazuh-dashboard && sudo chmod -R 775 /usr/share/wazuh-dashboard
-# Set capabilities for privileged port binding
-sudo setcap 'cap_net_bind_service=+ep' /usr/share/wazuh-dashboard/bin/opensearch-dashboards \
-    && sudo setcap 'cap_net_bind_service=+ep' /usr/share/wazuh-dashboard/node/fallback/bin/node
-```
+# Fetch branding assets
+fetch_files "https://cdn.conzex.com/?path=%2FDefendx-Assets%2FCustom+branding" "/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/"
+fetch_files "https://cdn.conzex.com/?path=%2FDefendx-Assets%2FWazuh-assets" "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/"
 
----
+# Change Ownership & Permissions for Defendx Dashboard
+echo -e "${BLUE}Setting ownership for Wazuh Dashboard...${RESET}"
+sudo chown -R admin:admin /usr/share/wazuh-dashboard
+sudo chmod -R 775 /usr/share/wazuh-dashboard
 
-## Managing Custom Logo for Wazuh Dashboard
-```bash
-# Create required directories and set permissions
-sudo mkdir -p /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images \
-    && sudo chown -R wazuh:wazuh /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom \
-    && sudo chmod -R 755 /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
+# Allow Binding to Privileged Ports
+echo -e "${BLUE}Enabling port bindings...${RESET}"
+sudo setcap 'cap_net_bind_service=+ep' /usr/share/wazuh-dashboard/bin/opensearch-dashboards
+sudo setcap 'cap_net_bind_service=+ep' /usr/share/wazuh-dashboard/node/fallback/bin/node
 
-# Ensure logo file exists
-sudo touch /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/customization.logo.app.svg \
-    && sudo chown wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/customization.logo.app.svg \
-    && sudo chmod 664 /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/customization.logo.app.svg
-```
-
----
-
-## Configuring Wazuh Configuration File
-```bash
-sudo chown wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml \
-    && sudo chmod 644 /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
-```
-
----
-
-## Restarting Wazuh Services
-```bash
-# Restart and check all Wazuh services in one command
-for service in wazuh-manager wazuh-dashboard wazuh-indexer; do 
-    sudo systemctl restart $service && sudo systemctl status $service --no-pager; 
+# Restart Wazuh Services
+echo -e "${BLUE}Restarting Wazuh Services...${RESET}"
+for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
+    sudo systemctl restart $service
+    sudo systemctl status $service --no-pager
 done
-```
 
----
-
-## Custom Branding (Title, Hostname, Boot, Banner)
-```bash
 # Set Web Title
-sudo sed -i 's/applicationTitle:.*/applicationTitle: "Defendx - Unified XDR and SIEM"/' /etc/wazuh-dashboard/opensearch_dashboards.yml
+echo -e "${BLUE}Setting Dashboard Title...${RESET}"
+sudo sed -i '/opensearchDashboards.branding:/a applicationTitle: "Defendx - Unified XDR and SIEM"' /etc/wazuh-dashboard/opensearch_dashboards.yml
 
-# Change Hostname for Web Access
-sudo sed -i 's/127.0.0.1.*/127.0.0.1 defendx/' /etc/hosts && sudo sed -i 's/::1.*/::1 defendx/' /etc/hosts
+# Update Hosts File for Web Access
+echo -e "${BLUE}Updating Hosts File...${RESET}"
+sudo bash -c 'echo -e "127.0.0.1   defendx\n::1         defend" >> /etc/hosts'
 
-# Boot-up Logo
-sudo curl -o /boot/grub2/defendx.png https://cdn.conzex.com/uploads/defendx.png && \
-    echo 'GRUB_BACKGROUND="/boot/grub2/defendx.png"' | sudo tee -a /etc/default/grub && \
-    sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+# Update Boot-up Text & Logo
+echo -e "${BLUE}Updating Boot Logo...${RESET}"
+sudo curl -s -o /boot/grub2/defendx.png https://cdn.conzex.com/uploads/Defendx-Assets/defendx.png
+sudo sed -i 's|^GRUB_BACKGROUND=.*|GRUB_BACKGROUND="/boot/grub2/defendx.png"|' /etc/default/grub
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 
-# Terminal Login Banner (MOTD)
-echo "$(figlet -f big 'DefendX')" | sudo tee /etc/motd
-```
+# Set Terminal Login Banner (MOTD)
+echo -e "${BLUE}Setting Terminal Banner...${RESET}"
+sudo bash -c 'figlet -f big "DefendX" > /etc/motd'
 
----
+# Clear Cache & Restart Dashboard
+echo -e "${BLUE}Clearing Cache and Restarting Dashboard...${RESET}"
+sudo rm -rf /usr/share/wazuh-dashboard/optimize/*
+sudo systemctl restart wazuh-dashboard
 
-## Clearing Cache
-```bash
-sudo rm -rf /usr/share/wazuh-dashboard/optimize/* && sudo systemctl restart wazuh-dashboard
-```
-
----
-
-## Troubleshooting Commands
-```bash
-# Check if custom logo file exists
+# Troubleshooting Commands
+echo -e "${YELLOW}Verifying Branding Files...${RESET}"
 ls -l /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/
-
-# Find key files
 find /usr/share/wazuh-dashboard -type f -name "customization.logo.app.svg"
 find /usr/share/wazuh-dashboard -type f -name "favicon.svg"
-find /usr/share/wazuh-dashboard -type f -name "help_menu.tsx" 2>/dev/null
-find /usr/share/wazuh-dashboard -type f -name "wazuh_agent.c"
+find /usr/share/wazuh-dashboard/ -type f -name "wazuh_agent.c"
+
+# Completion Message
+echo -e "${GREEN}✔ Defendx Dashboard setup & branding completed successfully!${RESET}"
