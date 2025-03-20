@@ -94,16 +94,7 @@ const OPENSEARCH_DASHBOARDS_ON_DARK = 'ui/logos/defendx_dashboards_on_dark.svg';
 const OPENSEARCH_THEMED = 'ui/logos/defendx.svg';
 const OPENSEARCH_ON_LIGHT = 'ui/logos/defendx_on_light.svg';
 const OPENSEARCH_ON_DARK = 'ui/logos/defendx_on_dark.svg';
-const MARK_THEMED = 'ui/logos/defendx_mark.svg';
-const MARK_ON_LIGHT = 'ui/logos/defendx_mark_on_light.svg';
-const MARK_ON_DARK = 'ui/logos/defendx_mark_on_dark.svg';
-const CENTER_MARK_THEMED = 'ui/logos/defendx_center_mark.svg';
-const CENTER_MARK_ON_LIGHT = 'ui/logos/defendx_center_mark_on_light.svg';
-const CENTER_MARK_ON_DARK = 'ui/logos/defendx_center_mark_on_dark.svg';
-const ANIMATED_MARK_THEMED = 'ui/logos/spinner.svg';
-const ANIMATED_MARK_ON_LIGHT = 'ui/logos/spinner_on_light.svg';
-const ANIMATED_MARK_ON_DARK = 'ui/logos/spinner_on_dark.svg';
-EOL
+EOL"
 echo -e "${GREEN}✅ Logos renamed in get_logos.js!${RESET}"
 
 # Step 7: Update /etc/issue for Branding
@@ -149,4 +140,4 @@ echo -e "🚀 **Service Status:** ${status_line% | }"
 echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
 echo -e "🌐 Dashboard Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 User: admin"
-echo -e "🔒 Password: admin"
+echo -e "🔒 Password: Adm1n@123"
