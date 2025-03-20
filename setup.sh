@@ -67,7 +67,7 @@ LOGO_PATHS=(
     "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/30e500f584235c2912f16c790345f966.svg"
 )
 
-NEW_LOGO_PATH="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"  # Update with actual logo path
+NEW_LOGO_PATH="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"
 
 # Function to replace logos
 replace_logos() {
@@ -132,31 +132,40 @@ echo -e "${BLUE}🔹 Restarting Wazuh Services...${RESET}"
 for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     sudo systemctl restart $service
     sudo systemctl enable $service
-    echo -e "${GREEN}✅ Service $service restarted successfully!${RESET}"
+    if systemctl is-active --quiet $service; then
+        echo -e "${GREEN}✅ Service $service restarted successfully!${RESET}"
+    else
+        echo -e "${RED}❌ Service $service failed to start!${RESET}"
+    fi
 done
 
 # Display service status
 echo -e "${BLUE}🔹 Checking service status...${RESET}"
 services=(wazuh-manager wazuh-indexer wazuh-dashboard)
 status_line=""
+
 for service in "${services[@]}"; do
-    if systemctl is-active --quiet $service; then
+    status=$(systemctl show -p SubState --value $service)
+    if [[ "$status" == "running" ]]; then
         status_line+="${GREEN}$service: Running${RESET} | "
     else
-        status_line+="${RED}$service: Stopped${RESET} | "
+        status_line+="${RED}$service: Stopped ($status)${RESET} | "
     fi
 done
 
-echo -e "Service Status: ${status_line% | }"
+# Remove the trailing ' | ' and print final status
+echo -e "🚀 **Service Status:** ${status_line% | }"
 
 # Final Message
 echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
-echo -e "🔑 ${BOLD}Login Credentials:${RESET}"
+echo -e "🔑 ${BOLD}SSH Login Credentials:${RESET}"
 echo -e "👤 User: admin"
 echo -e "🔒 Password: Adm1n@123"
+echo -e " "
 echo -e "🌐 Dashboard Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 Username: admin"
 echo -e "🔒 Password: admin"
+echo -e " "
 echo -e "${GREEN}${BOLD}🚀 DefendX Setup completed successfully!${RESET}"
 
 EOF
