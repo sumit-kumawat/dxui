@@ -33,10 +33,15 @@ if id "wazuh-user" &>/dev/null; then
     sudo find / -user wazuh-user -exec chown admin:admin {} \; 2>/dev/null
     echo -e "\e[32m✔ Ownership transferred!\e[0m"
 
-    echo -e "\e[34mRemoving 'wazuh-user'...\e[0m"
-    sudo pkill -u wazuh-user || true
-    sudo userdel -r wazuh-user || true
-    echo -e "\e[32m✔ 'wazuh-user' removed successfully!\e[0m"
+    read -p "Are you sure you want to delete 'wazuh-user'? (y/N): " confirm
+    if [[ "\$confirm" =~ ^[Yy]$ ]]; then
+        echo -e "\e[34mRemoving 'wazuh-user'...\e[0m"
+        sudo pkill -u wazuh-user || true
+        sudo userdel -r wazuh-user || true
+        echo -e "\e[32m✔ 'wazuh-user' removed successfully!\e[0m"
+    else
+        echo -e "\e[33m✔ 'wazuh-user' deletion skipped.\e[0m"
+    fi
 else
     echo -e "\e[33m✔ 'wazuh-user' does not exist, skipping removal.\e[0m"
 fi
@@ -122,17 +127,7 @@ echo -e "🔒 Password: admin"
 
 echo "Defendx Setup completed successfully!"
 
-# Confirm Deletion of wazuh-user
-echo -e "${YELLOW}⚠ WARNING: Do you want to delete 'wazuh-user'? (y/N)${RESET}"
-read -r confirm
-if [[ "$confirm" =~ ^[Yy]$ ]]; then
-    sudo pkill -u wazuh-user || true
-    sudo userdel -r wazuh-user || true
-    echo -e "${GREEN}✔ 'wazuh-user' removed successfully!${RESET}"
-else
-    echo -e "${YELLOW}✔ 'wazuh-user' deletion skipped.${RESET}"
-fi
 EOF
 
-
+echo -e "${YELLOW}✔ 'wazuh-user' deletion skipped.${RESET}"
 
