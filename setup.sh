@@ -32,16 +32,25 @@ hostnamectl set-hostname defendx
 echo -e "127.0.0.1   defendx\n::1         defendx" >> /etc/hosts
 echo -e "${GREEN}✅ Hostname and Hosts file updated!${RESET}"
 
-# Step 3: Transfer ownership and remove 'wazuh-user' if exists
+# Step 3: Transfer ownership and remove 'wazuh-user' if it exists
 if id "wazuh-user" &>/dev/null; then
     echo -e "${BLUE}🔹 Transferring ownership of 'wazuh-user' files to 'admin'...${RESET}"
-    find / -user wazuh-user -exec chown admin:admin {} \; 2>/dev/null
+    
+    # Define target directories to scan instead of full system scan
+    for dir in /home /var /opt /usr/local; do
+        find "$dir" -user wazuh-user -exec chown admin:admin {} + 2>/dev/null
+    done
+
     echo -e "${GREEN}✅ Ownership transferred!${RESET}"
+
     read -p "❓ Are you sure you want to delete 'wazuh-user'? (y/N): " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
         echo -e "${BLUE}🔹 Removing 'wazuh-user'...${RESET}"
+        
+        # Ensure user is not logged in before deletion
         pkill -u wazuh-user || true
         userdel -r wazuh-user || true
+        
         echo -e "${GREEN}✅ 'wazuh-user' removed successfully!${RESET}"
     else
         echo -e "${YELLOW}⚠ 'wazuh-user' deletion skipped.${RESET}"
@@ -49,6 +58,7 @@ if id "wazuh-user" &>/dev/null; then
 else
     echo -e "${YELLOW}⚠ 'wazuh-user' does not exist, skipping removal.${RESET}"
 fi
+
 
 # Step 4: Download and Extract Assets
 echo -e "${BLUE}🔹 Downloading assets from DefendX CDN...${RESET}"
