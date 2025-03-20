@@ -30,7 +30,7 @@ echo -e "${BLUE}Switching to user 'admin' and continuing setup as root...${RESET
 su - admin -c "bash -s" << 'EOF'
 echo -e "\e[34mTransferring ownership of 'wazuh-user' files to 'admin'...\e[0m"
 if id "wazuh-user" &>/dev/null; then
-    find / -user wazuh-user -exec sudo chown admin:admin {} \; 2>/dev/null
+    sudo find / -user wazuh-user -exec chown admin:admin {} \; 2>/dev/null
     echo -e "\e[32m✔ Ownership transferred!\e[0m"
 
     echo -e "\e[34mRemoving 'wazuh-user'...\e[0m"
