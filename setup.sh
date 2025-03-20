@@ -79,17 +79,33 @@ for location in "${logo_locations[@]}"; do
 done
 echo -e "${GREEN}✔ Logo replacement completed!${RESET}"
 
+# Update get_logos.js for DefendX Branding
+echo -e "${BLUE}Renaming Defendx Dashboard logos...${RESET}"
+LOGO_JS_PATH="/usr/share/wazuh-dashboard/src/core/common/logos/get_logos.js"
+sudo bash -c "cat << EOF > \$LOGO_JS_PATH
+const OPENSEARCH_DASHBOARDS_THEMED = exports.OPENSEARCH_DASHBOARDS_THEMED = 'ui/logos/defendx_dashboards.svg';
+const OPENSEARCH_DASHBOARDS_ON_LIGHT = exports.OPENSEARCH_DASHBOARDS_ON_LIGHT = 'ui/logos/defendx_dashboards_on_light.svg';
+const OPENSEARCH_DASHBOARDS_ON_DARK = exports.OPENSEARCH_DASHBOARDS_ON_DARK = 'ui/logos/defendx_dashboards_on_dark.svg';
+const OPENSEARCH_THEMED = exports.OPENSEARCH_THEMED = 'ui/logos/defendx.svg';
+const OPENSEARCH_ON_LIGHT = exports.OPENSEARCH_ON_LIGHT = 'ui/logos/defendx_on_light.svg';
+const OPENSEARCH_ON_DARK = exports.OPENSEARCH_ON_DARK = 'ui/logos/defendx_on_dark.svg';
+const MARK_THEMED = exports.MARK_THEMED = 'ui/logos/defendx_mark.svg';
+const MARK_ON_LIGHT = exports.MARK_ON_LIGHT = 'ui/logos/defendx_mark_on_light.svg';
+const MARK_ON_DARK = exports.MARK_ON_DARK = 'ui/logos/defendx_mark_on_dark.svg';
+const CENTER_MARK_THEMED = exports.CENTER_MARK_THEMED = 'ui/logos/defendx_center_mark.svg';
+const CENTER_MARK_ON_LIGHT = exports.CENTER_MARK_ON_LIGHT = 'ui/logos/defendx_center_mark_on_light.svg';
+const CENTER_MARK_ON_DARK = exports.CENTER_MARK_ON_DARK = 'ui/logos/defendx_center_mark_on_dark.svg';
+const ANIMATED_MARK_THEMED = exports.ANIMATED_MARK_THEMED = 'ui/logos/spinner.svg';
+const ANIMATED_MARK_ON_LIGHT = exports.ANIMATED_MARK_ON_LIGHT = 'ui/logos/spinner_on_light.svg';
+const ANIMATED_MARK_ON_DARK = exports.ANIMATED_MARK_ON_DARK = 'ui/logos/spinner_on_dark.svg';
+EOF"
+echo -e "${GREEN}✔ Logos renamed in get_logos.js!${RESET}"
+
 # Update Dashboard Branding
 echo -e "${BLUE}Updating Dashboard Branding...${RESET}"
 sudo sed -i '/opensearchDashboards.branding:/,/applicationTitle:/d' /etc/wazuh-dashboard/opensearch_dashboards.yml
 sudo bash -c 'echo -e "opensearchDashboards.branding:\n  applicationTitle: \"DefendX - Unified XDR and SIEM\"" >> /etc/wazuh-dashboard/opensearch_dashboards.yml'
 echo -e "${GREEN}✔ Dashboard branding updated successfully!${RESET}"
-
-# Clear Wazuh Dashboard Cache
-echo -e "${BLUE}Clearing Wazuh Dashboard cache...${RESET}"
-sudo rm -rf /usr/share/wazuh-dashboard/data/*
-sudo systemctl restart wazuh-dashboard
-echo -e "${GREEN}✔ Cache cleared successfully!${RESET}"
 
 # Update Boot Logo
 echo -e "${BLUE}Updating Boot Logo...${RESET}"
@@ -98,6 +114,12 @@ sudo curl -s -o /boot/grub2/defendx.png "$boot_logo_url"
 sudo sed -i 's|^GRUB_BACKGROUND=.*|GRUB_BACKGROUND="/boot/grub2/defendx.png"|' /etc/default/grub
 sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 echo -e "${GREEN}✔ Boot logo updated!${RESET}"
+
+# Clear Defendx Dashboard Cache
+echo -e "${BLUE}Clearing Wazuh Dashboard cache...${RESET}"
+sudo rm -rf /usr/share/wazuh-dashboard/data/*
+sudo systemctl restart wazuh-dashboard
+echo -e "${GREEN}✔ Cache cleared successfully!${RESET}"
 
 # Restart Services
 echo -e "${BLUE}Restarting Wazuh Services...${RESET}"
@@ -113,5 +135,5 @@ echo -e "🔑 Login Credentials:"
 echo -e "👤 User: admin"
 echo -e "🔒 Password: Adm1n@123"
 echo -e "🌐 Dashboard Login: http://$(hostname -I | awk '{print $1}') or $(hostname)"
-echo -e "🖥 Username: admin"
-echo -e "🖥 Password: admin"
+echo -e "👤 Username: admin"
+echo -e "🔒 Password: admin"
