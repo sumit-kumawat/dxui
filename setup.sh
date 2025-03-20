@@ -28,33 +28,24 @@ echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/admin
 # Switch to 'admin' and execute remaining steps
 echo -e "${BLUE}Switching to user 'admin' and continuing setup as root...${RESET}"
 su - admin -c "bash -s" << 'EOF'
-echo -e "\e[34mTransferring ownership of 'wazuh-user' files to 'admin'...\e[0m"
+
+echo -e "${BLUE}Transferring ownership of 'wazuh-user' files to 'admin'...${RESET}"
 if id "wazuh-user" &>/dev/null; then
     sudo find / -user wazuh-user -exec chown admin:admin {} \; 2>/dev/null
-    echo -e "\e[32m✔ Ownership transferred!\e[0m"
+    echo -e "${GREEN}✔ Ownership transferred!${RESET}"
 
     read -p "Are you sure you want to delete 'wazuh-user'? (y/N): " confirm
-    if [[ "\$confirm" =~ ^[Yy]$ ]]; then
-        echo -e "\e[34mRemoving 'wazuh-user'...\e[0m"
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        echo -e "${BLUE}Removing 'wazuh-user'...${RESET}"
         sudo pkill -u wazuh-user || true
         sudo userdel -r wazuh-user || true
-        echo -e "\e[32m✔ 'wazuh-user' removed successfully!\e[0m"
+        echo -e "${GREEN}✔ 'wazuh-user' removed successfully!${RESET}"
     else
-        echo -e "\e[33m✔ 'wazuh-user' deletion skipped.\e[0m"
+        echo -e "${YELLOW}✔ 'wazuh-user' deletion skipped.${RESET}"
     fi
 else
-    echo -e "\e[33m✔ 'wazuh-user' does not exist, skipping removal.\e[0m"
+    echo -e "${YELLOW}✔ 'wazuh-user' does not exist, skipping removal.${RESET}"
 fi
-
-# Update /etc/issue with DefendX Branding
-echo -e "${BLUE}Updating /etc/issue with DefendX branding...${RESET}"
-sudo bash -c 'cat << EOL > /etc/issue
-🔹 Welcome to DefendX – Unified XDR & SIEM 🔹
-📖 Documentation: docs.conzex.com/defendx
-🌐 Website: www.conzex.com
-📧 Support: defendx-support@conzex.com
-EOL'
-echo -e "${GREEN}✔ /etc/issue updated successfully!${RESET}"
 
 # Set Hostname
 echo -e "${BLUE}Setting hostname to: DefendX...${RESET}"
@@ -108,6 +99,16 @@ const ANIMATED_MARK_ON_DARK = exports.ANIMATED_MARK_ON_DARK = 'ui/logos/spinner_
 EOL"
 echo -e "${GREEN}✔ Logos renamed in get_logos.js!${RESET}"
 
+# Update /etc/issue with DefendX Branding
+echo -e "${BLUE}Updating /etc/issue with DefendX branding...${RESET}"
+sudo bash -c 'cat << EOL > /etc/issue
+🔹 Welcome to DefendX – Unified XDR & SIEM 🔹
+📖 Documentation: docs.conzex.com/defendx
+🌐 Website: www.conzex.com
+📧 Support: defendx-support@conzex.com
+EOL'
+echo -e "${GREEN}✔ /etc/issue updated successfully!${RESET}"
+
 # Restart Services
 echo -e "${BLUE}Restarting Wazuh Services...${RESET}"
 for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
@@ -119,15 +120,15 @@ done
 # Final Message
 echo -e "${GREEN}✔ DefendX setup completed successfully!${RESET}"
 echo -e "🔑 Login Credentials:"
+echo -e "_______________________________________________________________"
 echo -e "👤 User: admin"
 echo -e "🔒 Password: Adm1n@123"
-echo -e "🌐 Dashboard Login: http://$(hostname -I | awk '{print $1}') or $(hostname)"
+echo -e "_______________________________________________________________"
+echo -e "🌐 Dashboard Login: http://$(hostname -I | awk '{print $1}')"
+echo -e "_______________________________________________________________"
 echo -e "👤 Username: admin"
 echo -e "🔒 Password: admin"
-
+echo -e "_______________________________________________________________"
 echo "Defendx Setup completed successfully!"
 
 EOF
-
-echo -e "${YELLOW}✔ 'wazuh-user' deletion skipped.${RESET}"
-
