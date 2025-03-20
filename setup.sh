@@ -78,7 +78,7 @@ echo -e "${BLUE}🔹 Replacing Wazuh logos with DefendX logos...${RESET}"
 LOGO_PATHS=(
     "/usr/share/wazuh-dashboard/plugins/securityDashboards/target/public/30e500f584235c2912f16c790345f966.svg"
 )
-NEW_LOGO_PATH="$TARGET_DIR/30e500f584235c2912f16c790345f966.svg"
+NEW_LOGO_PATH="/usr/share/wazuh-dashboard/plugins/securityDashboards/target/public/"
 
 for FILE in "${LOGO_PATHS[@]}"; do
     if [[ -f "$FILE" ]]; then
