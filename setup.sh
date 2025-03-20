@@ -62,21 +62,31 @@ echo -e "${GREEN}✅ Hosts file updated!${RESET}"
 
 # Replace Wazuh Logo with DefendX Logo
 echo -e "${BLUE}🔹 Replacing Wazuh logos with DefendX logos...${RESET}"
-logo_url="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"
-logo_locations=(
+LOGO_PATHS=(
     "/usr/share/wazuh-dashboard/plugins/securityDashboards/target/public/30e500f584235c2912f16c790345f966.svg"
     "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/30e500f584235c2912f16c790345f966.svg"
 )
 
-for location in "${logo_locations[@]}"; do
-    if [ -f "$location" ]; then
-        sudo curl -s -o "$location" "$logo_url"
-        sudo chown wazuh:wazuh "$location"
-        sudo chmod 644 "$location"
-        echo -e "${GREEN}✅ Logo updated for: $location${RESET}"
-    else
-        echo -e "${RED}✖ Logo file not found: $location, skipping...${RESET}"
-    fi
+NEW_LOGO_PATH="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"  # Update with actual logo path
+
+# Function to replace logos
+replace_logos() {
+    for FILE in "${LOGO_PATHS[@]}"; do
+        if [[ -f "$FILE" ]]; then
+            cp "$NEW_LOGO_PATH" "$FILE"
+            echo "✅ Replaced: $FILE"
+        else
+            echo "✖ Logo file not found: $FILE, skipping..."
+        fi
+    done
+}
+
+# Ensure the new logo exists
+if [[ ! -f "$NEW_LOGO_PATH" ]]; then
+    echo "❌ Error: DefendX logo file is missing at $NEW_LOGO_PATH. Please provide the correct path."
+    exit 1
+fi
+
 done
 echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
 
