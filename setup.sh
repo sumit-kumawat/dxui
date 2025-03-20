@@ -62,17 +62,11 @@ logo_locations=(
 
 for location in "${logo_locations[@]}"; do
     if [ -f "$location" ]; then
-        sudo cp "$location" "$location.bak"
-        echo -e "${YELLOW}✔ Backup created for: $location${RESET}"
-        
-        # Download and replace logo
+        # Download and replace logo directly
         sudo curl -s -o "$location" "$logo_url"
         sudo chown wazuh:wazuh "$location"
         sudo chmod 644 "$location"
-
-        # Remove backup after replacement
-        sudo rm -f "$location.bak"
-        echo -e "${GREEN}✔ Logo updated and backup removed for: $location${RESET}"
+        echo -e "${GREEN}✔ Logo updated for: $location${RESET}"
     else
         echo -e "${RED}✖ Logo file not found: $location, skipping...${RESET}"
     fi
