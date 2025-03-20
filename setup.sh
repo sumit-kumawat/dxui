@@ -17,7 +17,7 @@ fi
 
 # Creating user 'admin' with sudo privileges
 echo -e "${BLUE}Creating user 'admin' with sudo privileges...${RESET}"
-useradd -m -s /bin/bash admin
+useradd -m -s /bin/bash admin || true
 echo "admin:Adm1n@123" | chpasswd
 usermod -aG wheel admin  # 'wheel' group for sudo on Amazon Linux
 echo -e "${GREEN}✔ User 'admin' created successfully!${RESET}"
@@ -25,23 +25,20 @@ echo -e "${GREEN}✔ User 'admin' created successfully!${RESET}"
 # Ensure admin user has passwordless sudo
 echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/admin
 
-# Switch to 'admin' and execute remaining steps as root
+# Switch to 'admin' and execute remaining steps
 echo -e "${BLUE}Switching to user 'admin' and continuing setup as root...${RESET}"
-su - admin -c "sudo bash -c '$(cat << 'EOF'
+su - admin -c "bash -c '$(cat << "EOF"
+echo -e "\e[34mTransferring ownership of 'wazuh-user' files to 'admin'...\e[0m"
+if id "wazuh-user" &>/dev/null; then
+    find / -user wazuh-user -exec sudo chown admin:admin {} \; 2>/dev/null
+    echo -e "\e[32m✔ Ownership transferred!\e[0m"
 
-# Transferring ownership of 'wazuh-user' files to 'admin'
-echo -e \"${BLUE}Transferring ownership of 'wazuh-user' files to 'admin'...${RESET}\"
-if id \"wazuh-user\" &>/dev/null; then
-    find / -user wazuh-user -exec chown admin:admin {} \; 2>/dev/null
-    echo -e \"${GREEN}✔ Ownership transferred!${RESET}\"
-
-    # Removing 'wazuh-user' from system
-    echo -e \"${BLUE}Removing 'wazuh-user'...${RESET}\"
-    pkill -u wazuh-user || true
-    userdel -r wazuh-user || true
-    echo -e \"${GREEN}✔ 'wazuh-user' removed successfully!${RESET}\"
+    echo -e "\e[34mRemoving 'wazuh-user'...\e[0m"
+    sudo pkill -u wazuh-user || true
+    sudo userdel -r wazuh-user || true
+    echo -e "\e[32m✔ 'wazuh-user' removed successfully!\e[0m"
 else
-    echo -e \"${YELLOW}✔ 'wazuh-user' does not exist, skipping removal.${RESET}\"
+    echo -e "\e[33m✔ 'wazuh-user' does not exist, skipping removal.\e[0m"
 fi
 
 # Update /etc/issue with DefendX Branding
@@ -142,3 +139,7 @@ echo -e "🔒 Password: Adm1n@123"
 echo -e "🌐 Dashboard Login: http://$(hostname -I | awk '{print $1}') or $(hostname)"
 echo -e "👤 Username: admin"
 echo -e "🔒 Password: admin"
+
+EOF
+
+echo "Defendx Setup completed successfully!"
