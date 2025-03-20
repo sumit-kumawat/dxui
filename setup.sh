@@ -13,7 +13,7 @@ RESET="\e[0m"
 echo -e "${BLUE}Creating user 'admin' with sudo privileges...${RESET}"
 sudo useradd -m -s /bin/bash admin
 echo "admin:Adm1n@123" | sudo chpasswd
-sudo usermod -aG sudo admin
+sudo usermod -aG wheel admin  # 'wheel' group for sudo in Amazon Linux
 echo -e "${GREEN}✔ User 'admin' created successfully!${RESET}"
 
 # Transferring ownership of 'wazuh-user' files to 'admin'
@@ -24,9 +24,8 @@ if id "wazuh-user" &>/dev/null; then
 
     # Removing 'wazuh-user' from system
     echo -e "${BLUE}Removing 'wazuh-user'...${RESET}"
-    sudo deluser wazuh-user
     sudo pkill -u wazuh-user || true
-    sudo userdel -r wazuh-user
+    sudo userdel -r wazuh-user || true
     echo -e "${GREEN}✔ 'wazuh-user' removed successfully!${RESET}"
 else
     echo -e "${YELLOW}✔ 'wazuh-user' does not exist, skipping removal.${RESET}"
@@ -49,7 +48,7 @@ echo -e "${GREEN}✔ Hostname updated!${RESET}"
 
 # Update Hosts File
 echo -e "${BLUE}Updating Hosts File...${RESET}"
-sudo bash -c 'echo -e "127.0.0.1   defendx\n::1         defend" >> /etc/hosts'
+sudo bash -c 'echo -e "127.0.0.1   defendx\n::1         defendx" >> /etc/hosts'
 echo -e "${GREEN}✔ Hosts file updated!${RESET}"
 
 # Replace Wazuh Logo with DefendX Logo
@@ -62,7 +61,6 @@ logo_locations=(
 
 for location in "${logo_locations[@]}"; do
     if [ -f "$location" ]; then
-        # Download and replace logo directly
         sudo curl -s -o "$location" "$logo_url"
         sudo chown wazuh:wazuh "$location"
         sudo chmod 644 "$location"
@@ -109,7 +107,7 @@ sudo sed -i 's|^GRUB_BACKGROUND=.*|GRUB_BACKGROUND="/boot/grub2/defendx.png"|' /
 sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 echo -e "${GREEN}✔ Boot logo updated!${RESET}"
 
-# Clear Defendx Dashboard Cache
+# Clear DefendX Dashboard Cache
 echo -e "${BLUE}Clearing Wazuh Dashboard cache...${RESET}"
 sudo rm -rf /usr/share/wazuh-dashboard/data/*
 sudo systemctl restart wazuh-dashboard
@@ -120,10 +118,10 @@ echo -e "${BLUE}Restarting Wazuh Services...${RESET}"
 for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     sudo systemctl restart $service
     sudo systemctl enable $service
-    sudo systemctl status $service --no-pager
     echo -e "${GREEN}✔ Service $service restarted successfully!${RESET}"
 done
 
+# Final Message
 echo -e "${GREEN}✔ DefendX setup completed successfully!${RESET}"
 echo -e "🔑 Login Credentials:"
 echo -e "👤 User: admin"
