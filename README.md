@@ -32,7 +32,7 @@ Ensure your system has:
 Run the following commands to set up **DefendX** on your Wazuh instance:
 
 ```bash
-curl -sSL https://github.com/sumit-kumawat/dxui.git
+curl https://github.com/sumit-kumawat/dxui.git
 cd dxui
 ```
 ---
