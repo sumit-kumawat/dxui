@@ -117,6 +117,20 @@ for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     echo -e "${GREEN}✔ Service $service restarted successfully!${RESET}"
 done
 
+# Display service status
+echo -e "${BLUE}Checking service status...${RESET}"
+services=(wazuh-manager wazuh-indexer wazuh-dashboard)
+status_line=""
+for service in "${services[@]}"; do
+    if systemctl is-active --quiet $service; then
+        status_line+="${GREEN}$service: Running${RESET} | "
+    else
+        status_line+="${RED}$service: Stopped${RESET} | "
+    fi
+done
+
+echo -e "Service Status: ${status_line% | }"
+
 # Final Message
 echo -e "${GREEN}✔ DefendX setup completed successfully!${RESET}"
 echo -e "🔑 Login Credentials:"
