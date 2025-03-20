@@ -61,7 +61,7 @@ if ! unzip -t /tmp/defendx-assets/assets.zip &>/dev/null; then
     echo -e "${RED}❌ Downloaded assets are corrupt. Retrying...${RESET}"
     rm -f /tmp/defendx-assets/assets.zip
     sleep 5  # Wait before retry
-    curl -L -o /tmp/defendx-assets/assets.zip <ASSETS_ZIP_URL>
+    curl -L -o /tmp/defendx-assets/assets.zip https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets.zip
 fi
 
 # Extract assets
