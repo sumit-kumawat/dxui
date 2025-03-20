@@ -119,6 +119,20 @@ echo -e "🔒 Password: Adm1n@123"
 echo -e "🌐 Dashboard Login: http://$(hostname -I | awk '{print $1}') or $(hostname)"
 echo -e "👤 Username: admin"
 echo -e "🔒 Password: admin"
-EOF
 
 echo "Defendx Setup completed successfully!"
+
+# Confirm Deletion of wazuh-user
+echo -e "${YELLOW}⚠ WARNING: Do you want to delete 'wazuh-user'? (y/N)${RESET}"
+read -r confirm
+if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    sudo pkill -u wazuh-user || true
+    sudo userdel -r wazuh-user || true
+    echo -e "${GREEN}✔ 'wazuh-user' removed successfully!${RESET}"
+else
+    echo -e "${YELLOW}✔ 'wazuh-user' deletion skipped.${RESET}"
+fi
+EOF
+
+
+
