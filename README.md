@@ -32,8 +32,8 @@ Ensure your system has:
 Run the following commands to set up **DefendX** on your Wazuh instance:
 
 ```bash
-sudo apt update && sudo apt install -y curl
-curl -sSL https://github.com/sumit-kumawat/dxui/raw/main/setup.sh | sudo bash
+curl -sSL https://github.com/sumit-kumawat/dxui.git
+cd dxui
 ```
 ---
 
