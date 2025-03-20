@@ -51,7 +51,7 @@ echo -e "${BLUE}🔹 Downloading assets from DefendX CDN...${RESET}"
 mkdir -p /tmp/defendx-assets
 
 # Download assets with error handling
-if ! curl -L -o /tmp/defendx-assets/assets.zip <ASSETS_ZIP_URL>; then
+if ! curl -L -o /tmp/defendx-assets/assets.zip https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets.zip; then
     echo -e "${RED}❌ Failed to download assets! Check the URL or network.${RESET}"
     exit 1
 fi
