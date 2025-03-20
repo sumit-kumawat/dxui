@@ -62,20 +62,30 @@ fi
 
 # Step 4: Download and Extract Assets
 echo -e "${BLUE}🔹 Downloading assets from DefendX CDN...${RESET}"
-TARGET_DIR="/usr/share/wazuh-dashboard/src/core/server/core_app/assets/"
-TEMP_DIR="/tmp/defendx-assets"
-CDN_URL="https://cdn.conzex.com/?path=%2FDefendx-Assets%2FWazuh-assets"
-mkdir -p "$TEMP_DIR"
-curl -L -o "$TEMP_DIR/assets.zip" "$CDN_URL" --progress-bar
+mkdir -p /tmp/defendx-assets
 
-if [[ ! -f "$TEMP_DIR/assets.zip" ]]; then
-    echo -e "${RED}❌ Error: Download failed. Please check the CDN URL.${RESET}"
+# Download assets with error handling
+if ! curl -L -o /tmp/defendx-assets/assets.zip <ASSETS_ZIP_URL>; then
+    echo -e "${RED}❌ Failed to download assets! Check the URL or network.${RESET}"
     exit 1
 fi
 
-unzip -o "$TEMP_DIR/assets.zip" -d "$TARGET_DIR"
-rm -rf "$TEMP_DIR"
-echo -e "${GREEN}✅ Assets successfully updated in $TARGET_DIR!${RESET}"
+# Validate the ZIP file
+if ! unzip -t /tmp/defendx-assets/assets.zip &>/dev/null; then
+    echo -e "${RED}❌ Downloaded assets are corrupt. Retrying...${RESET}"
+    rm -f /tmp/defendx-assets/assets.zip
+    sleep 5  # Wait before retry
+    curl -L -o /tmp/defendx-assets/assets.zip <ASSETS_ZIP_URL>
+fi
+
+# Extract assets
+if unzip -o /tmp/defendx-assets/assets.zip -d /tmp/defendx-assets; then
+    echo -e "${GREEN}✅ Assets downloaded and extracted successfully!${RESET}"
+else
+    echo -e "${RED}❌ Extraction failed! Check if assets.zip is valid.${RESET}"
+    exit 1
+fi
+
 
 # Step 5: Replace Logos
 echo -e "${BLUE}🔹 Replacing Wazuh logos with DefendX logos...${RESET}"
