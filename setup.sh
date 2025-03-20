@@ -147,6 +147,6 @@ echo -e "🚀 **Service Status:** ${status_line% | }"
 
 # Final Message
 echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
-echo -e "🔑 ${BOLD}SSH Login Credentials:${RESET}"
+echo -e "🌐 Dashboard Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 User: admin"
-echo -e "🔒 Password: Adm1n@123"
+echo -e "🔒 Password: admin"
