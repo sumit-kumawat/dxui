@@ -9,26 +9,39 @@ RED="\e[31m"
 YELLOW="\e[33m"
 RESET="\e[0m"
 
+# Ensure script is running as root
+if [ "$(id -u)" -ne 0 ]; then
+    echo -e "${RED}✖ This script must be run as root!${RESET}"
+    exit 1
+fi
+
 # Creating user 'admin' with sudo privileges
 echo -e "${BLUE}Creating user 'admin' with sudo privileges...${RESET}"
-sudo useradd -m -s /bin/bash admin
-echo "admin:Adm1n@123" | sudo chpasswd
-sudo usermod -aG wheel admin  # 'wheel' group for sudo in Amazon Linux
+useradd -m -s /bin/bash admin
+echo "admin:Adm1n@123" | chpasswd
+usermod -aG wheel admin  # 'wheel' group for sudo on Amazon Linux
 echo -e "${GREEN}✔ User 'admin' created successfully!${RESET}"
 
+# Ensure admin user has passwordless sudo
+echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/admin
+
+# Switch to 'admin' and execute remaining steps as root
+echo -e "${BLUE}Switching to user 'admin' and continuing setup as root...${RESET}"
+su - admin -c "sudo bash -c '$(cat << 'EOF'
+
 # Transferring ownership of 'wazuh-user' files to 'admin'
-echo -e "${BLUE}Transferring ownership of 'wazuh-user' files to 'admin'...${RESET}"
-if id "wazuh-user" &>/dev/null; then
-    sudo find / -user wazuh-user -exec chown admin:admin {} \; 2>/dev/null
-    echo -e "${GREEN}✔ Ownership transferred!${RESET}"
+echo -e \"${BLUE}Transferring ownership of 'wazuh-user' files to 'admin'...${RESET}\"
+if id \"wazuh-user\" &>/dev/null; then
+    find / -user wazuh-user -exec chown admin:admin {} \; 2>/dev/null
+    echo -e \"${GREEN}✔ Ownership transferred!${RESET}\"
 
     # Removing 'wazuh-user' from system
-    echo -e "${BLUE}Removing 'wazuh-user'...${RESET}"
-    sudo pkill -u wazuh-user || true
-    sudo userdel -r wazuh-user || true
-    echo -e "${GREEN}✔ 'wazuh-user' removed successfully!${RESET}"
+    echo -e \"${BLUE}Removing 'wazuh-user'...${RESET}\"
+    pkill -u wazuh-user || true
+    userdel -r wazuh-user || true
+    echo -e \"${GREEN}✔ 'wazuh-user' removed successfully!${RESET}\"
 else
-    echo -e "${YELLOW}✔ 'wazuh-user' does not exist, skipping removal.${RESET}"
+    echo -e \"${YELLOW}✔ 'wazuh-user' does not exist, skipping removal.${RESET}\"
 fi
 
 # Update /etc/issue with DefendX Branding
