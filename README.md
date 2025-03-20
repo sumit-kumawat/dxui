@@ -32,9 +32,12 @@ Ensure your system has:
 Run the following commands to set up **DefendX** on your Wazuh instance:
 
 ```bash
-curl https://github.com/sumit-kumawat/dxui.git
-cd dxui
+curl -L -o dxui.zip https://github.com/sumit-kumawat/dxui/archive/refs/heads/main.zip
+unzip dxui.zip && cd dxui-main
+chmod +x install.sh
+sudo ./install.sh
 ```
+
 ---
 
 ## 🔑 **Default Credentials**
@@ -43,8 +46,8 @@ cd dxui
 |----------------|---------------|
 | **Admin User** | `admin`       |
 | **Password**   | `Adm1n@123`   |
-| **Dashboard**  | `https://<server-ip>` |
-| **Login**      | `admin` / `admin` |
+| **Dashboard URL** | `https://<server-ip>` |
+| **Login Credentials** | `admin` / `Adm1n@123` |
 
 ---
 
@@ -70,9 +73,8 @@ sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard
 
 📖 Documentation: [docs.conzex.com/defendx](https://docs.conzex.com/defendx)  
 🌐 Website: [www.conzex.com](https://www.conzex.com)  
-📧 Email: [defendx-support@conzex.com](mailto:defendx-support@conzex.com)
+📧 Email: [defendx-support@conzex.com](mailto:defendx-support@conzex.com)  
 
 ---
 
 🚀 **Enjoy enhanced security and monitoring with DefendX!** 🔥
-
