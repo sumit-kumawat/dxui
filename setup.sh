@@ -84,7 +84,7 @@ echo -e "${GREEN}✔ Logo replacement completed!${RESET}"
 # Update get_logos.js for DefendX Branding
 echo -e "${BLUE}Renaming Defendx Dashboard logos...${RESET}"
 LOGO_JS_PATH="/usr/share/wazuh-dashboard/src/core/common/logos/get_logos.js"
-sudo bash -c "cat << EOF > \$LOGO_JS_PATH
+sudo bash -c "cat > $LOGO_JS_PATH << 'EOF'"
 const OPENSEARCH_DASHBOARDS_THEMED = exports.OPENSEARCH_DASHBOARDS_THEMED = 'ui/logos/defendx_dashboards.svg';
 const OPENSEARCH_DASHBOARDS_ON_LIGHT = exports.OPENSEARCH_DASHBOARDS_ON_LIGHT = 'ui/logos/defendx_dashboards_on_light.svg';
 const OPENSEARCH_DASHBOARDS_ON_DARK = exports.OPENSEARCH_DASHBOARDS_ON_DARK = 'ui/logos/defendx_dashboards_on_dark.svg';
