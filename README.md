@@ -34,8 +34,8 @@ Run the following commands to set up **DefendX** on your Wazuh instance:
 ```bash
 curl -L -o dxui.zip https://github.com/sumit-kumawat/dxui/archive/refs/heads/main.zip
 unzip dxui.zip && cd dxui-main
-chmod +x install.sh
-sudo ./install.sh
+chmod +x setup.sh
+sudo ./setup.sh
 ```
 
 ---
