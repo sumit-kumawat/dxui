@@ -60,14 +60,66 @@ echo -e "${BLUE}🔹 Updating Hosts File...${RESET}"
 sudo bash -c 'echo -e "127.0.0.1   defendx\n::1         defendx" >> /etc/hosts'
 echo -e "${GREEN}✅ Hosts file updated!${RESET}"
 
+# Ensure the new logo exists
+if [[ ! -f "$NEW_LOGO_PATH" ]]; then
+    echo "❌ Error: DefendX logo file is missing at $NEW_LOGO_PATH. Please provide the correct path."
+    exit 1
+fi
+
+done
+
+# Directories
+TARGET_DIR="/usr/share/wazuh-dashboard/src/core/server/core_app/assets/"
+TEMP_DIR="/tmp/defendx-assets"
+CDN_URL="https://cdn.conzex.com/?path=%2FDefendx-Assets%2FWazuh-assets"
+
+# Function to show progress bar
+progress_bar() {
+    local total_size=$(curl -sI "$CDN_URL" | awk '/Content-Length/ {print $2}')
+    local downloaded=0
+    local progress=0
+    while [[ $downloaded -lt $total_size ]]; do
+        downloaded=$(stat --format="%s" "$TEMP_DIR/assets.zip" 2>/dev/null || echo 0)
+        progress=$(( (downloaded * 100) / total_size ))
+        echo -ne "${BLUE}Downloading Assets: ${progress}%\r${RESET}"
+        sleep 1
+    done
+    echo -e "${GREEN}✅ Download complete!${RESET}"
+}
+
+# Download Assets from CDN
+echo -e "${BLUE}🔹 Downloading assets from DefendX CDN...${RESET}"
+mkdir -p "$TEMP_DIR"
+curl -L -o "$TEMP_DIR/assets.zip" "$CDN_URL" --progress-bar &
+progress_bar
+
+# Validate Download
+if [[ ! -f "$TEMP_DIR/assets.zip" ]]; then
+    echo -e "${RED}❌ Error: Download failed. Please check the CDN URL.${RESET}"
+    exit 1
+fi
+
+# Extract and Replace
+echo -e "${BLUE}🔹 Extracting new assets...${RESET}"
+sudo unzip -o "$TEMP_DIR/assets.zip" -d "$TARGET_DIR"
+
+# Cleanup
+rm -rf "$TEMP_DIR"
+
+# Verify Success
+if [[ "$(ls -A $TARGET_DIR)" ]]; then
+    echo -e "${GREEN}✅ Assets successfully updated in $TARGET_DIR!${RESET}"
+else
+    echo -e "${RED}❌ Error: Assets replacement failed.${RESET}"
+fi
+
 # Replace Wazuh Logo with DefendX Logo
 echo -e "${BLUE}🔹 Replacing Wazuh logos with DefendX logos...${RESET}"
 LOGO_PATHS=(
     "/usr/share/wazuh-dashboard/plugins/securityDashboards/target/public/30e500f584235c2912f16c790345f966.svg"
-    "/usr/share/wazuh-dashboard/src/core/server/core_app/assets/30e500f584235c2912f16c790345f966.svg"
 )
 
-NEW_LOGO_PATH="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"
+NEW_LOGO_PATH="/usr/share/wazuh-dashboard/src/core/server/core_app/assets/30e500f584235c2912f16c790345f966.svg"
 
 # Function to replace logos
 replace_logos() {
@@ -81,13 +133,6 @@ replace_logos() {
     done
 }
 
-# Ensure the new logo exists
-if [[ ! -f "$NEW_LOGO_PATH" ]]; then
-    echo "❌ Error: DefendX logo file is missing at $NEW_LOGO_PATH. Please provide the correct path."
-    exit 1
-fi
-
-done
 echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
 
 # Update get_logos.js for DefendX Branding
