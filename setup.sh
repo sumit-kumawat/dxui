@@ -42,6 +42,9 @@ if id "wazuh-user" &>/dev/null; then
     done
 
     echo -e "${GREEN}✅ Ownership transferred!${RESET}"
+else
+    echo -e "${YELLOW}⚠ 'wazuh-user' does not exist, skipping ownership transfer.${RESET}"
+fi
 
 # Step 4: Download and Extract Assets
 echo -e "${BLUE}🔹 Downloading assets from DefendX CDN...${RESET}"
