@@ -27,7 +27,7 @@ echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/admin
 
 # Switch to 'admin' and execute remaining steps
 echo -e "${BLUE}Switching to user 'admin' and continuing setup as root...${RESET}"
-su - admin -c "bash -c '$(cat << "EOF"
+su - admin -c "bash -s" << 'EOF'
 echo -e "\e[34mTransferring ownership of 'wazuh-user' files to 'admin'...\e[0m"
 if id "wazuh-user" &>/dev/null; then
     find / -user wazuh-user -exec sudo chown admin:admin {} \; 2>/dev/null
@@ -43,12 +43,12 @@ fi
 
 # Update /etc/issue with DefendX Branding
 echo -e "${BLUE}Updating /etc/issue with DefendX branding...${RESET}"
-sudo bash -c 'cat << EOF > /etc/issue
+sudo bash -c 'cat << EOL > /etc/issue
 🔹 Welcome to DefendX – Unified XDR & SIEM 🔹
 📖 Documentation: docs.conzex.com/defendx
 🌐 Website: www.conzex.com
 📧 Support: defendx-support@conzex.com
-EOF'
+EOL'
 echo -e "${GREEN}✔ /etc/issue updated successfully!${RESET}"
 
 # Set Hostname
@@ -84,7 +84,7 @@ echo -e "${GREEN}✔ Logo replacement completed!${RESET}"
 # Update get_logos.js for DefendX Branding
 echo -e "${BLUE}Renaming Defendx Dashboard logos...${RESET}"
 LOGO_JS_PATH="/usr/share/wazuh-dashboard/src/core/common/logos/get_logos.js"
-sudo bash -c "cat > $LOGO_JS_PATH << 'EOF'"
+sudo bash -c "cat > $LOGO_JS_PATH << 'EOL'
 const OPENSEARCH_DASHBOARDS_THEMED = exports.OPENSEARCH_DASHBOARDS_THEMED = 'ui/logos/defendx_dashboards.svg';
 const OPENSEARCH_DASHBOARDS_ON_LIGHT = exports.OPENSEARCH_DASHBOARDS_ON_LIGHT = 'ui/logos/defendx_dashboards_on_light.svg';
 const OPENSEARCH_DASHBOARDS_ON_DARK = exports.OPENSEARCH_DASHBOARDS_ON_DARK = 'ui/logos/defendx_dashboards_on_dark.svg';
@@ -100,28 +100,8 @@ const CENTER_MARK_ON_DARK = exports.CENTER_MARK_ON_DARK = 'ui/logos/defendx_cent
 const ANIMATED_MARK_THEMED = exports.ANIMATED_MARK_THEMED = 'ui/logos/spinner.svg';
 const ANIMATED_MARK_ON_LIGHT = exports.ANIMATED_MARK_ON_LIGHT = 'ui/logos/spinner_on_light.svg';
 const ANIMATED_MARK_ON_DARK = exports.ANIMATED_MARK_ON_DARK = 'ui/logos/spinner_on_dark.svg';
-EOF"
+EOL"
 echo -e "${GREEN}✔ Logos renamed in get_logos.js!${RESET}"
-
-# Update Dashboard Branding
-echo -e "${BLUE}Updating Dashboard Branding...${RESET}"
-sudo sed -i '/opensearchDashboards.branding:/,/applicationTitle:/d' /etc/wazuh-dashboard/opensearch_dashboards.yml
-sudo bash -c 'echo -e "opensearchDashboards.branding:\n  applicationTitle: \"DefendX - Unified XDR and SIEM\"" >> /etc/wazuh-dashboard/opensearch_dashboards.yml'
-echo -e "${GREEN}✔ Dashboard branding updated successfully!${RESET}"
-
-# Update Boot Logo
-echo -e "${BLUE}Updating Boot Logo...${RESET}"
-boot_logo_url="https://cdn.conzex.com/uploads/Defendx-Assets/defendx.png"
-sudo curl -s -o /boot/grub2/defendx.png "$boot_logo_url"
-sudo sed -i 's|^GRUB_BACKGROUND=.*|GRUB_BACKGROUND="/boot/grub2/defendx.png"|' /etc/default/grub
-sudo grub2-mkconfig -o /boot/grub2/grub.cfg
-echo -e "${GREEN}✔ Boot logo updated!${RESET}"
-
-# Clear DefendX Dashboard Cache
-echo -e "${BLUE}Clearing Wazuh Dashboard cache...${RESET}"
-sudo rm -rf /usr/share/wazuh-dashboard/data/*
-sudo systemctl restart wazuh-dashboard
-echo -e "${GREEN}✔ Cache cleared successfully!${RESET}"
 
 # Restart Services
 echo -e "${BLUE}Restarting Wazuh Services...${RESET}"
@@ -139,7 +119,6 @@ echo -e "🔒 Password: Adm1n@123"
 echo -e "🌐 Dashboard Login: http://$(hostname -I | awk '{print $1}') or $(hostname)"
 echo -e "👤 Username: admin"
 echo -e "🔒 Password: admin"
-
 EOF
 
 echo "Defendx Setup completed successfully!"
