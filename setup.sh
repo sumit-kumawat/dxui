@@ -71,7 +71,7 @@ if [[ ! -d "$TARGET_DIR" ]]; then
 fi
 
 if curl -o "$LOGO_PATH" -L "$LOGO_URL" --silent --fail; then
-    echo -e "${GREEN}✅ Successfully replaced: {RESET}"
+    echo -e "${GREEN}✅ Successfully replaced!"
 else
     echo -e "${RED}✖ Failed to download logo from $LOGO_URL${RESET}"
     exit 1
