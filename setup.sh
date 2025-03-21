@@ -74,32 +74,48 @@ fi
 
 
 # Step 5: Replace Logos
-echo -e "${BLUE}🔹 Replacing Wazuh logos with DefendX logos...${RESET}"
-LOGO_PATHS=(
-    "/usr/share/wazuh-dashboard/plugins/securityDashboards/target/public/30e500f584235c2912f16c790345f966.svg"
-)
-NEW_LOGO_PATH="/usr/share/wazuh-dashboard/plugins/securityDashboards/target/public/"
+echo -e "${BLUE}🔹 Downloading and replacing Wazuh logos with DefendX logos...${RESET}"
 
-for FILE in "${LOGO_PATHS[@]}"; do
-    if [[ -f "$FILE" ]]; then
-        cp "$NEW_LOGO_PATH" "$FILE"
-        echo "✅ Replaced: $FILE"
-    else
-        echo "✖ Logo file not found: $FILE, skipping..."
-    fi
-done
+# Define variables
+LOGO_URL="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"
+LOGO_PATH="/usr/share/wazuh-dashboard/plugins/securityDashboards/target/public/30e500f584235c2912f16c790345f966.svg"
+
+# Ensure target directory exists
+TARGET_DIR=$(dirname "$LOGO_PATH")
+if [[ ! -d "$TARGET_DIR" ]]; then
+    echo -e "${RED}✖ Target directory does not exist: $TARGET_DIR${RESET}"
+    exit 1
+fi
+
+# Download the new logo
+if curl -o "$LOGO_PATH" -L "$LOGO_URL" --silent --fail; then
+    echo -e "${GREEN}✅ Successfully replaced: $LOGO_PATH${RESET}"
+else
+    echo -e "${RED}✖ Failed to download logo from $LOGO_URL${RESET}"
+    exit 1
+fi
+
 echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
 
 # Step 6: Update Branding Files
 echo -e "${BLUE}🔹 Updating get_logos.js for DefendX Branding...${RESET}"
 LOGO_JS_PATH="/usr/share/wazuh-dashboard/src/core/common/logos/get_logos.js"
 sudo bash -c "cat > $LOGO_JS_PATH << 'EOL'
-const OPENSEARCH_DASHBOARDS_THEMED = 'ui/logos/defendx_dashboards.svg';
-const OPENSEARCH_DASHBOARDS_ON_LIGHT = 'ui/logos/defendx_dashboards_on_light.svg';
-const OPENSEARCH_DASHBOARDS_ON_DARK = 'ui/logos/defendx_dashboards_on_dark.svg';
-const OPENSEARCH_THEMED = 'ui/logos/defendx.svg';
-const OPENSEARCH_ON_LIGHT = 'ui/logos/defendx_on_light.svg';
-const OPENSEARCH_ON_DARK = 'ui/logos/defendx_on_dark.svg';
+const OPENSEARCH_DASHBOARDS_THEMED = exports.OPENSEARCH_DASHBOARDS_THEMED = 'ui/logos/defendx_dashboards.svg';
+const OPENSEARCH_DASHBOARDS_ON_LIGHT = exports.OPENSEARCH_DASHBOARDS_ON_LIGHT = 'ui/logos/defendx_dashboards_on_light.svg';
+const OPENSEARCH_DASHBOARDS_ON_DARK = exports.OPENSEARCH_DASHBOARDS_ON_DARK = 'ui/logos/defendx_dashboards_on_dark.svg';
+const OPENSEARCH_THEMED = exports.OPENSEARCH_THEMED = 'ui/logos/defendx.svg';
+const OPENSEARCH_ON_LIGHT = exports.OPENSEARCH_ON_LIGHT = 'ui/logos/defendx_on_light.svg';
+const OPENSEARCH_ON_DARK = exports.OPENSEARCH_ON_DARK = 'ui/logos/defendx_on_dark.svg';
+const MARK_THEMED = exports.MARK_THEMED = 'ui/logos/defendx_mark.svg';
+const MARK_ON_LIGHT = exports.MARK_ON_LIGHT = 'ui/logos/defendx_mark_on_light.svg';
+const MARK_ON_DARK = exports.MARK_ON_DARK = 'ui/logos/defendx_mark_on_dark.svg';
+const CENTER_MARK_THEMED = exports.CENTER_MARK_THEMED = 'ui/logos/defendx_center_mark.svg';
+const CENTER_MARK_ON_LIGHT = exports.CENTER_MARK_ON_LIGHT = 'ui/logos/defendx_center_mark_on_light.svg';
+const CENTER_MARK_ON_DARK = exports.CENTER_MARK_ON_DARK = 'ui/logos/defendx_center_mark_on_dark.svg';
+const ANIMATED_MARK_THEMED = exports.ANIMATED_MARK_THEMED = 'ui/logos/spinner.svg';
+const ANIMATED_MARK_ON_LIGHT = exports.ANIMATED_MARK_ON_LIGHT = 'ui/logos/spinner_on_light.svg';
+const ANIMATED_MARK_ON_DARK = exports.ANIMATED_MARK_ON_DARK = 'ui/logos/spinner_on_dark.svg';
 EOL"
 echo -e "${GREEN}✅ Logos renamed in get_logos.js!${RESET}"
 
