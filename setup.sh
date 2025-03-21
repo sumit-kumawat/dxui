@@ -70,10 +70,9 @@ echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
 # Step 7: Update /etc/issue for Branding
 echo -e "${BLUE}🔹 Updating /etc/issue with DefendX branding...${RESET}"
 cat << EOL > /etc/issue
-🔹 Welcome to DefendX – Unified XDR & SIEM 🔹
-📖 Documentation: docs.conzex.com/defendx
-🌐 Website: www.conzex.com
-📧 Support: defendx-support@conzex.com
+Welcome to DefendX – Unified XDR & SIEM
+
+www.conzex.com
 _______________________________________________________________________
 👤 User: admin
 🔒 Password: Adm1n@123 (Change required on first login)
