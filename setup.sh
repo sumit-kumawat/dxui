@@ -108,7 +108,7 @@ echo -e "🚀 **Service Status:** ${status_line% | }"
 
 # Step 8: Final Warning Before Reboot
 echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
-echo -e "🌐 Dashboard Login: https://$(hostname -I | awk '{print $1}')"
+echo -e "🌐 Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 User: admin"
 echo -e "🔒 Password: admin"
 
