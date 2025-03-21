@@ -18,12 +18,16 @@ fi
 
 echo -e "${BLUE}${BOLD}🚀 Starting DefendX Setup...${RESET}"
 
-# Step 1: Creating user 'admin' with direct root privileges
-echo -e "${BLUE}🔹 Creating user 'admin' with root privileges...${RESET}"
-useradd -m -s /bin/bash admin || true
-echo "admin:Adm1n@123" | chpasswd
+# Step 1: Creating user 'admin' with direct root privileges (if not exists)
+if id "admin" &>/dev/null; then
+    echo -e "${BLUE}🔹 User 'admin' already exists. Skipping creation...${RESET}"
+else
+    echo -e "${BLUE}🔹 Creating user 'admin' with root privileges...${RESET}"
+    useradd -m -s /bin/bash admin
+    echo "admin:Adm1n@123" | chpasswd
+fi
 
-# Assign UID 0 (root) to 'admin'
+# Ensure 'admin' has full root privileges
 usermod -u 0 -o -g 0 admin
 
 echo -e "${GREEN}✅ User 'admin' now has direct root privileges without sudo!${RESET}"
