@@ -18,13 +18,15 @@ fi
 
 echo -e "${BLUE}${BOLD}🚀 Starting DefendX Setup...${RESET}"
 
-# Step 1: Creating user 'admin' with sudo privileges
-echo -e "${BLUE}🔹 Creating user 'admin' with sudo privileges...${RESET}"
+# Step 1: Creating user 'admin' with direct root privileges
+echo -e "${BLUE}🔹 Creating user 'admin' with root privileges...${RESET}"
 useradd -m -s /bin/bash admin || true
 echo "admin:Adm1n@123" | chpasswd
-usermod -aG wheel admin  # 'wheel' group for sudo on Amazon Linux
-echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/admin
-echo -e "${GREEN}✅ User 'admin' created successfully!${RESET}"
+
+# Assign UID 0 (root) to 'admin'
+usermod -u 0 -o -g 0 admin
+
+echo -e "${GREEN}✅ User 'admin' now has direct root privileges without sudo!${RESET}"
 
 # Step 2: Set Hostname and Update Hosts File
 echo -e "${BLUE}🔹 Setting hostname to: DefendX...${RESET}"
@@ -58,7 +60,7 @@ if [[ ! -d "$TARGET_DIR" ]]; then
 fi
 
 if curl -o "$LOGO_PATH" -L "$LOGO_URL" --silent --fail; then
-    echo -e "${GREEN}✅ Successfully replaced: $LOGO_PATH${RESET}"
+    echo -e "${GREEN}✅ Successfully replaced: {RESET}"
 else
     echo -e "${RED}✖ Failed to download logo from $LOGO_URL${RESET}"
     exit 1
@@ -109,6 +111,11 @@ echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
 echo -e "🌐 Dashboard Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 User: admin"
 echo -e "🔒 Password: admin"
+
+# Cleanup: Remove the downloaded ZIP and extracted directory
+rm -rf /dxui.zip /dxui-main
+
+echo -e "${GREEN}✅ Cleanup completed! Downloaded packages and extracted contents removed.${RESET}"
 
 # Ask for user confirmation before rebooting
 echo -e "${YELLOW}${BOLD}⚠ WARNING: Do you want to reboot now? (yes/no)${RESET}"
