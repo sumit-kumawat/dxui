@@ -24,6 +24,7 @@ useradd -m -s /bin/bash admin || true
 echo "admin:Adm1n@123" | chpasswd
 usermod -aG wheel admin  # 'wheel' group for sudo on Amazon Linux
 echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/admin
+passwd --expire admin  # Force password change on first login
 echo -e "${GREEN}✅ User 'admin' created successfully!${RESET}"
 
 # Step 2: Set Hostname and Update Hosts File
@@ -36,7 +37,6 @@ echo -e "${GREEN}✅ Hostname and Hosts file updated!${RESET}"
 if id "wazuh-user" &>/dev/null; then
     echo -e "${BLUE}🔹 Transferring ownership of 'wazuh-user' files to 'admin'...${RESET}"
     
-    # Define target directories to scan instead of full system scan
     for dir in /home /var /opt /usr/local; do
         find "$dir" -user wazuh-user -exec chown admin:admin {} + 2>/dev/null
     done
@@ -49,18 +49,15 @@ fi
 # Step 5: Replace Logos
 echo -e "${BLUE}🔹 Downloading and replacing DefendX logos...${RESET}"
 
-# Define variables
 LOGO_URL="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"
 LOGO_PATH="/usr/share/wazuh-dashboard/plugins/securityDashboards/target/public/30e500f584235c2912f16c790345f966.svg"
 
-# Ensure target directory exists
 TARGET_DIR=$(dirname "$LOGO_PATH")
 if [[ ! -d "$TARGET_DIR" ]]; then
     echo -e "${RED}✖ Target directory does not exist: $TARGET_DIR${RESET}"
     exit 1
 fi
 
-# Download the new logo
 if curl -o "$LOGO_PATH" -L "$LOGO_URL" --silent --fail; then
     echo -e "${GREEN}✅ Successfully replaced: $LOGO_PATH${RESET}"
 else
@@ -69,8 +66,6 @@ else
 fi
 
 echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
-
-
 
 # Step 7: Update /etc/issue for Branding
 echo -e "${BLUE}🔹 Updating /etc/issue with DefendX branding...${RESET}"
@@ -81,7 +76,7 @@ cat << EOL > /etc/issue
 📧 Support: defendx-support@conzex.com
 _______________________________________________________________________
 👤 User: admin
-🔒 Password: Adm1n@123
+🔒 Password: Adm1n@123 (Change required on first login)
 EOL
 echo -e "${GREEN}✅ /etc/issue updated successfully!${RESET}"
 
@@ -111,8 +106,10 @@ for service in "${services[@]}"; do
 done
 echo -e "🚀 **Service Status:** ${status_line% | }"
 
-# Final Message
-echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
-echo -e "🌐 Login: https://$(hostname -I | awk '{print $1}')"
-echo -e "👤 User: admin"
-echo -e "🔒 Password: admin"
+# Final Warning Before Reboot
+echo -e "${YELLOW}${BOLD}⚠ WARNING: The system will reboot in 10 seconds! Press Ctrl+C to cancel.${RESET}"
+sleep 10
+
+# Force Reboot
+echo -e "${RED}${BOLD}🔄 Rebooting now...${RESET}"
+reboot
