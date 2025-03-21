@@ -46,6 +46,33 @@ else
     echo -e "${YELLOW}⚠ 'wazuh-user' does not exist, skipping ownership transfer.${RESET}"
 fi
 
+# Step 4: Download and Extract Assets
+echo -e "${BLUE}🔹 Downloading assets from DefendX CDN...${RESET}"
+mkdir -p /tmp/defendx-assets
+
+# Download assets with error handling
+if ! curl -L -o /tmp/defendx-assets/assets.zip https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets.zip; then
+    echo -e "${RED}❌ Failed to download assets! Check the URL or network.${RESET}"
+    exit 1
+fi
+
+# Validate the ZIP file
+if ! unzip -t /tmp/defendx-assets/assets.zip &>/dev/null; then
+    echo -e "${RED}❌ Downloaded assets are corrupt. Retrying...${RESET}"
+    rm -f /tmp/defendx-assets/assets.zip
+    sleep 5  # Wait before retry
+    curl -L -o /tmp/defendx-assets/assets.zip https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets.zip
+fi
+
+# Extract assets
+if unzip -o /tmp/defendx-assets/assets.zip -d /tmp/defendx-assets; then
+    echo -e "${GREEN}✅ Assets downloaded and extracted successfully!${RESET}"
+else
+    echo -e "${RED}❌ Extraction failed! Check if assets.zip is valid.${RESET}"
+    exit 1
+fi
+
+
 # Step 5: Replace Logos
 echo -e "${BLUE}🔹 Downloading and replacing Wazuh logos with DefendX logos...${RESET}"
 
@@ -70,33 +97,12 @@ fi
 
 echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
 
-# Step 6: Update Branding Files
-echo -e "${BLUE}🔹 Updating get_logos.js for DefendX Branding...${RESET}"
-LOGO_JS_PATH="/usr/share/wazuh-dashboard/src/core/common/logos/get_logos.js"
-sudo bash -c "cat > $LOGO_JS_PATH << 'EOL'
-const OPENSEARCH_DASHBOARDS_THEMED = exports.OPENSEARCH_DASHBOARDS_THEMED = 'ui/logos/defendx_dashboards.svg';
-const OPENSEARCH_DASHBOARDS_ON_LIGHT = exports.OPENSEARCH_DASHBOARDS_ON_LIGHT = 'ui/logos/defendx_dashboards_on_light.svg';
-const OPENSEARCH_DASHBOARDS_ON_DARK = exports.OPENSEARCH_DASHBOARDS_ON_DARK = 'ui/logos/defendx_dashboards_on_dark.svg';
-const OPENSEARCH_THEMED = exports.OPENSEARCH_THEMED = 'ui/logos/defendx.svg';
-const OPENSEARCH_ON_LIGHT = exports.OPENSEARCH_ON_LIGHT = 'ui/logos/defendx_on_light.svg';
-const OPENSEARCH_ON_DARK = exports.OPENSEARCH_ON_DARK = 'ui/logos/defendx_on_dark.svg';
-const MARK_THEMED = exports.MARK_THEMED = 'ui/logos/defendx_mark.svg';
-const MARK_ON_LIGHT = exports.MARK_ON_LIGHT = 'ui/logos/defendx_mark_on_light.svg';
-const MARK_ON_DARK = exports.MARK_ON_DARK = 'ui/logos/defendx_mark_on_dark.svg';
-const CENTER_MARK_THEMED = exports.CENTER_MARK_THEMED = 'ui/logos/defendx_center_mark.svg';
-const CENTER_MARK_ON_LIGHT = exports.CENTER_MARK_ON_LIGHT = 'ui/logos/defendx_center_mark_on_light.svg';
-const CENTER_MARK_ON_DARK = exports.CENTER_MARK_ON_DARK = 'ui/logos/defendx_center_mark_on_dark.svg';
-const ANIMATED_MARK_THEMED = exports.ANIMATED_MARK_THEMED = 'ui/logos/spinner.svg';
-const ANIMATED_MARK_ON_LIGHT = exports.ANIMATED_MARK_ON_LIGHT = 'ui/logos/spinner_on_light.svg';
-const ANIMATED_MARK_ON_DARK = exports.ANIMATED_MARK_ON_DARK = 'ui/logos/spinner_on_dark.svg';
-EOL"
-echo -e "${GREEN}✅ Logos renamed in get_logos.js!${RESET}"
+
 
 # Step 7: Update /etc/issue for Branding
 echo -e "${BLUE}🔹 Updating /etc/issue with DefendX branding...${RESET}"
 cat << EOL > /etc/issue
 🔹 Welcome to DefendX – Unified XDR & SIEM 🔹
-
 📖 Documentation: docs.conzex.com/defendx
 🌐 Website: www.conzex.com
 📧 Support: defendx-support@conzex.com
@@ -134,6 +140,6 @@ echo -e "🚀 **Service Status:** ${status_line% | }"
 
 # Final Message
 echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
-echo -e "🌐 Login: https://$(hostname -I | awk '{print $1}')"
+echo -e "🌐 Dashboard Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 User: admin"
 echo -e "🔒 Password: admin"
