@@ -24,7 +24,6 @@ useradd -m -s /bin/bash admin || true
 echo "admin:Adm1n@123" | chpasswd
 usermod -aG wheel admin  # 'wheel' group for sudo on Amazon Linux
 echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/admin
-passwd --expire admin  # Force password change on first login
 echo -e "${GREEN}✅ User 'admin' created successfully!${RESET}"
 
 # Step 2: Set Hostname and Update Hosts File
@@ -46,7 +45,7 @@ else
     echo -e "${YELLOW}⚠ 'wazuh-user' does not exist, skipping ownership transfer.${RESET}"
 fi
 
-# Step 5: Replace Logos
+# Step 4: Replace Logos
 echo -e "${BLUE}🔹 Downloading and replacing DefendX logos...${RESET}"
 
 LOGO_URL="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"
@@ -67,7 +66,7 @@ fi
 
 echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
 
-# Step 7: Update /etc/issue for Branding
+# Step 5: Update /etc/issue for Branding
 echo -e "${BLUE}🔹 Updating /etc/issue with DefendX branding...${RESET}"
 cat << EOL > /etc/issue
 Welcome to DefendX – Unified XDR & SIEM
@@ -75,11 +74,11 @@ Welcome to DefendX – Unified XDR & SIEM
 www.conzex.com
 _______________________________________________________________________
 👤 User: admin
-🔒 Password: Adm1n@123 (Change required on first login)
+🔒 Password: Adm1n@123
 EOL
 echo -e "${GREEN}✅ /etc/issue updated successfully!${RESET}"
 
-# Step 8: Restart Wazuh Services
+# Step 6: Restart Wazuh Services
 echo -e "${BLUE}🔹 Restarting Wazuh Services...${RESET}"
 for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     systemctl restart $service
@@ -91,7 +90,7 @@ for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     fi
 done
 
-# Step 9: Check Service Status
+# Step 7: Check Service Status
 echo -e "${BLUE}🔹 Checking service status...${RESET}"
 services=(wazuh-manager wazuh-indexer wazuh-dashboard)
 status_line=""
@@ -105,16 +104,20 @@ for service in "${services[@]}"; do
 done
 echo -e "🚀 **Service Status:** ${status_line% | }"
 
-# Final Warning Before Reboot
-
+# Step 8: Final Warning Before Reboot
 echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
 echo -e "🌐 Dashboard Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 User: admin"
 echo -e "🔒 Password: admin"
 
-echo -e "${YELLOW}${BOLD}⚠ WARNING: The system will reboot in 10 seconds! Press Ctrl+C to cancel.${RESET}"
-sleep 10
+# Ask for user confirmation before rebooting
+echo -e "${YELLOW}${BOLD}⚠ WARNING: Do you want to reboot now? (yes/no)${RESET}"
+read -r response
 
-# Force Reboot
-echo -e "${RED}${BOLD}🔄 Rebooting now...${RESET}"
-reboot
+if [[ "$response" =~ ^[Yy]([Ee][Ss])?$ ]]; then
+    echo -e "${RED}${BOLD}🔄 Rebooting now...${RESET}"
+    reboot
+else
+    echo -e "${GREEN}✅ Setup completed. Please reboot manually when ready.${RESET}"
+fi
+
