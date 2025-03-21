@@ -47,7 +47,7 @@ sudo ./setup.sh
 | **Admin User** | `admin`       |
 | **Password**   | `Adm1n@123`   |
 | **Dashboard URL** | `https://<server-ip>` |
-| **Login Credentials** | `admin` / `Adm1n@123` |
+| **Login Credentials** | `admin` / `admin` |
 
 ---
 
