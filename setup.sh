@@ -46,33 +46,6 @@ else
     echo -e "${YELLOW}⚠ 'wazuh-user' does not exist, skipping ownership transfer.${RESET}"
 fi
 
-# Step 4: Download and Extract Assets
-echo -e "${BLUE}🔹 Downloading assets from DefendX CDN...${RESET}"
-mkdir -p /tmp/defendx-assets
-
-# Download assets with error handling
-if ! curl -L -o /tmp/defendx-assets/assets.zip https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets.zip; then
-    echo -e "${RED}❌ Failed to download assets! Check the URL or network.${RESET}"
-    exit 1
-fi
-
-# Validate the ZIP file
-if ! unzip -t /tmp/defendx-assets/assets.zip &>/dev/null; then
-    echo -e "${RED}❌ Downloaded assets are corrupt. Retrying...${RESET}"
-    rm -f /tmp/defendx-assets/assets.zip
-    sleep 5  # Wait before retry
-    curl -L -o /tmp/defendx-assets/assets.zip https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets.zip
-fi
-
-# Extract assets
-if unzip -o /tmp/defendx-assets/assets.zip -d /tmp/defendx-assets; then
-    echo -e "${GREEN}✅ Assets downloaded and extracted successfully!${RESET}"
-else
-    echo -e "${RED}❌ Extraction failed! Check if assets.zip is valid.${RESET}"
-    exit 1
-fi
-
-
 # Step 5: Replace Logos
 echo -e "${BLUE}🔹 Downloading and replacing Wazuh logos with DefendX logos...${RESET}"
 
@@ -123,6 +96,7 @@ echo -e "${GREEN}✅ Logos renamed in get_logos.js!${RESET}"
 echo -e "${BLUE}🔹 Updating /etc/issue with DefendX branding...${RESET}"
 cat << EOL > /etc/issue
 🔹 Welcome to DefendX – Unified XDR & SIEM 🔹
+
 📖 Documentation: docs.conzex.com/defendx
 🌐 Website: www.conzex.com
 📧 Support: defendx-support@conzex.com
@@ -162,4 +136,4 @@ echo -e "🚀 **Service Status:** ${status_line% | }"
 echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
 echo -e "🌐 Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 User: admin"
-echo -e "🔒 Password: Adm1n@123"
+echo -e "🔒 Password: admin"
