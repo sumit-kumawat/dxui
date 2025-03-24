@@ -8,13 +8,15 @@
 
 ## 📌 **Features**
 
-✅ Creates an `admin` user with sudo privileges.  
+✅ Creates an `admin` user with root privileges.  
 ✅ Rebrands Wazuh with **DefendX** logos and branding.  
 ✅ Updates `/etc/issue` with custom branding details.  
 ✅ Changes hostname to `DefendX` and updates `/etc/hosts`.  
 ✅ Replaces **Wazuh Dashboard** branding.  
 ✅ Updates **boot logo** with DefendX branding.  
 ✅ Restarts all necessary Wazuh services after configuration.  
+✅ Transfers `wazuh-user` files to `admin` user.  
+✅ Ensures all services are running after setup.  
 
 ---
 
@@ -61,6 +63,19 @@ sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard
 
 ---
 
+## 🚀 **Script Workflow**
+
+1. **Set Hostname:** Updates system hostname to `defendx` and modifies `/etc/hosts`.
+2. **Update Wazuh Dashboard Branding:** Modifies `opensearch_dashboards.yml` for branding.
+3. **Create Admin User:** Ensures `admin` user exists with root privileges.
+4. **Transfer Ownership:** Transfers files from `wazuh-user` to `admin`.
+5. **Replace Logos:** Downloads and updates Wazuh dashboard branding with DefendX assets.
+6. **Update Branding in /etc/issue:** Adds DefendX branding to system login banner.
+7. **Restart Services:** Ensures all Wazuh services restart and run properly.
+8. **Final Confirmation:** Prompts for reboot to finalize setup.
+
+---
+
 ## 🛡 **Security & Hardening**
 
 - Change the default password **immediately after setup**.
@@ -78,3 +93,4 @@ sudo systemctl restart wazuh-manager wazuh-indexer wazuh-dashboard
 ---
 
 🚀 **Enjoy enhanced security and monitoring with DefendX!** 🔥
+
