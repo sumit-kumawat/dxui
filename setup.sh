@@ -101,8 +101,8 @@ fi
 
 echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
 
-# Step 7: Update /etc/issue for Branding
-echo -e "${BLUE}🔹 Updating /etc/issue with DefendX branding...${RESET}"
+# Step 7: Update SSH console Branding
+echo -e "${BLUE}🔹 Updating SSH console with DefendX branding...${RESET}"
 cat << EOL > /etc/issue
 Welcome to DefendX – Unified XDR & SIEM
 
@@ -111,7 +111,7 @@ _______________________________________________________________________
 👤 User: admin
 🔒 Password: Adm1n@123
 EOL
-echo -e "${GREEN}✅ /etc/issue updated successfully!${RESET}"
+echo -e "${GREEN}✅ SSH console updated successfully!${RESET}"
 
 # Step 8: Restart Wazuh Services
 echo -e "${BLUE}🔹 Restarting Wazuh Services...${RESET}"
