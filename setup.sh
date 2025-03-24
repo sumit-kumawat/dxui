@@ -24,6 +24,15 @@ hostnamectl set-hostname defendx
 echo -e "127.0.0.1   defendx\n::1         defendx" >> /etc/hosts
 echo -e "${GREEN}✅ Hostname and Hosts file updated!${RESET}"
 
+# Step 2: Configure Wazuh Dashboard Web Title
+echo -e "${BLUE}🔹 Configuring Wazuh Dashboard Title...${RESET}"
+if ! grep -q "opensearchDashboards.branding:" /etc/wazuh-dashboard/opensearch_dashboards.yml; then
+    echo -e "opensearchDashboards.branding:\n   applicationTitle: \"DefendX | Unified XDR and SIEM\"" >> /etc/wazuh-dashboard/opensearch_dashboards.yml
+    echo -e "${GREEN}✅ Web Title Updated!${RESET}"
+else
+    echo -e "${YELLOW}⚠ Web Title already exists. Skipping update.${RESET}"
+fi
+
 echo -e "${BLUE}🔹 Starting user setup...${RESET}"
 
 # Step 2: Create 'admin' user with root privileges
