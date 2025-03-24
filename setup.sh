@@ -127,7 +127,7 @@ rm -rf /dxui.zip /dxui-main
 echo -e "${GREEN}✅ Cleanup completed! Downloaded packages and extracted contents removed.${RESET}"
 
 # Ask for user confirmation before rebooting
-echo -e "${YELLOW}${BOLD}⚠ WARNING: Do you want to reboot now? (yes/no)${RESET}"
+echo -e "${YELLOW}${BOLD}⚠ WARNING: Do you want to reboot now? (y/n)${RESET}"
 read -r response
 
 if [[ "$response" =~ ^[Yy]([Ee][Ss])?$ ]]; then
