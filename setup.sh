@@ -18,34 +18,44 @@ fi
 
 echo -e "${BLUE}${BOLD}🚀 Starting DefendX Setup...${RESET}"
 
-# Step 1: Creating user 'admin' with direct root privileges
-echo -e "${BLUE}🔹 Creating user 'admin' with root privileges...${RESET}"
-useradd -m -s /bin/bash admin || true
-echo "admin:Adm1n@123" | chpasswd
-
-# Assign UID 0 (root) to 'admin'
-usermod -u 0 -o -g 0 admin
-
-echo -e "${GREEN}✅ User 'admin' now has direct root privileges without sudo!${RESET}"
-
-# Step 2: Set Hostname and Update Hosts File
+# Step 1: Set Hostname and Update Hosts File
 echo -e "${BLUE}🔹 Setting hostname to: DefendX...${RESET}"
 hostnamectl set-hostname defendx
 echo -e "127.0.0.1   defendx\n::1         defendx" >> /etc/hosts
 echo -e "${GREEN}✅ Hostname and Hosts file updated!${RESET}"
 
+echo -e "${BLUE}🔹 Starting user setup...${RESET}"
+
+# Step 2: Create 'admin' user with root privileges
+if id "admin" &>/dev/null; then
+    echo -e "${YELLOW}⚠ User 'admin' already exists. Skipping creation.${RESET}"
+else
+    echo -e "${BLUE}🔹 Creating user 'admin'...${RESET}"
+    useradd -m -s /bin/bash admin
+    echo "admin:Adm1n@123" | chpasswd
+    echo -e "${GREEN}✅ User 'admin' created successfully.${RESET}"
+fi
+
+# Assign UID 0 (root) to 'admin' (DANGEROUS!)
+echo -e "${YELLOW}⚠ Warning: Assigning UID 0 to 'admin'. This makes 'admin' an exact clone of 'root'!${RESET}"
+usermod -u 0 -o -g 0 admin
+echo -e "${GREEN}✅ User 'admin' now has direct root privileges without sudo!${RESET}"
+
 # Step 3: Transfer ownership of 'wazuh-user' files to 'admin' if it exists
 if id "wazuh-user" &>/dev/null; then
     echo -e "${BLUE}🔹 Transferring ownership of 'wazuh-user' files to 'admin'...${RESET}"
-    
+
     for dir in /home /var /opt /usr/local; do
         find "$dir" -user wazuh-user -exec chown admin:admin {} + 2>/dev/null
     done
 
-    echo -e "${GREEN}✅ Ownership transferred!${RESET}"
+    echo -e "${GREEN}✅ Ownership transferred successfully!${RESET}"
 else
-    echo -e "${YELLOW}⚠ 'wazuh-user' does not exist, skipping ownership transfer.${RESET}"
+    echo -e "${YELLOW}⚠ 'wazuh-user' does not exist. Skipping ownership transfer.${RESET}"
 fi
+
+# Step 3: Display success message
+echo -e "${GREEN}🎉 Script execution completed successfully!${RESET}"
 
 # Step 4: Replace Logos
 echo -e "${BLUE}🔹 Downloading and replacing DefendX logos...${RESET}"
@@ -114,7 +124,6 @@ echo -e "🔒 Password: admin"
 
 # Cleanup: Remove the downloaded ZIP and extracted directory
 rm -rf /dxui.zip /dxui-main
-
 echo -e "${GREEN}✅ Cleanup completed! Downloaded packages and extracted contents removed.${RESET}"
 
 # Ask for user confirmation before rebooting
@@ -127,4 +136,3 @@ if [[ "$response" =~ ^[Yy]([Ee][Ss])?$ ]]; then
 else
     echo -e "${GREEN}✅ Setup completed. Please reboot manually when ready.${RESET}"
 fi
-
