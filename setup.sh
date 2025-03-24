@@ -35,22 +35,30 @@ fi
 
 echo -e "${BLUE}🔹 Starting user setup...${RESET}"
 
-# Step 2: Create 'admin' user with root privileges
+# Step 3: Create 'admin' user with root privileges via sudo
 if id "admin" &>/dev/null; then
     echo -e "${YELLOW}⚠ User 'admin' already exists. Skipping creation.${RESET}"
 else
     echo -e "${BLUE}🔹 Creating user 'admin'...${RESET}"
     useradd -m -s /bin/bash admin
     echo "admin:Adm1n@123" | chpasswd
-    echo -e "${GREEN}✅ User 'admin' created successfully.${RESET}"
+    usermod -aG sudo admin
+    echo -e "${GREEN}✅ User 'admin' created successfully with sudo privileges.${RESET}"
 fi
 
-# Assign UID 0 (root) to 'admin' (DANGEROUS!)
-echo -e "${YELLOW}⚠ Warning: Assigning UID 0 to 'admin'. This makes 'admin' an exact clone of 'root'!${RESET}"
-usermod -u 0 -o -g 0 admin
-echo -e "${GREEN}✅ User 'admin' now has direct root privileges without sudo!${RESET}"
+# Step 4: Ensure SSH access for 'admin'
+echo -e "${BLUE}🔹 Configuring SSH access for 'admin'...${RESET}"
+if ! grep -q "^admin" /etc/sudoers; then
+    echo "admin ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+fi
 
-# Step 3: Transfer ownership of 'wazuh-user' files to 'admin' if it exists
+sed -i '/^#PermitRootLogin/s/^#//' /etc/ssh/sshd_config
+sed -i '/^#PasswordAuthentication/s/^#//' /etc/ssh/sshd_config
+sed -i '/^PasswordAuthentication/s/no/yes/' /etc/ssh/sshd_config
+systemctl restart sshd
+echo -e "${GREEN}✅ SSH configured successfully for 'admin'.${RESET}"
+
+# Step 5: Transfer ownership of 'wazuh-user' files to 'admin' if it exists
 if id "wazuh-user" &>/dev/null; then
     echo -e "${BLUE}🔹 Transferring ownership of 'wazuh-user' files to 'admin'...${RESET}"
 
@@ -63,10 +71,7 @@ else
     echo -e "${YELLOW}⚠ 'wazuh-user' does not exist. Skipping ownership transfer.${RESET}"
 fi
 
-# Step 3: Display success message
-echo -e "${GREEN}🎉 Script execution completed successfully!${RESET}"
-
-# Step 4: Replace Logos
+# Step 6: Replace Logos
 echo -e "${BLUE}🔹 Downloading and replacing DefendX logos...${RESET}"
 
 LOGO_URL="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"
@@ -79,7 +84,7 @@ if [[ ! -d "$TARGET_DIR" ]]; then
 fi
 
 if curl -o "$LOGO_PATH" -L "$LOGO_URL" --silent --fail; then
-    echo -e "${GREEN}✅ Successfully replaced!"
+    echo -e "${GREEN}✅ Successfully replaced!${RESET}"
 else
     echo -e "${RED}✖ Failed to download logo from $LOGO_URL${RESET}"
     exit 1
@@ -87,7 +92,7 @@ fi
 
 echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
 
-# Step 5: Update /etc/issue for Branding
+# Step 7: Update /etc/issue for Branding
 echo -e "${BLUE}🔹 Updating /etc/issue with DefendX branding...${RESET}"
 cat << EOL > /etc/issue
 Welcome to DefendX – Unified XDR & SIEM
@@ -99,7 +104,7 @@ _______________________________________________________________________
 EOL
 echo -e "${GREEN}✅ /etc/issue updated successfully!${RESET}"
 
-# Step 6: Restart Wazuh Services
+# Step 8: Restart Wazuh Services
 echo -e "${BLUE}🔹 Restarting Wazuh Services...${RESET}"
 for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     systemctl restart $service
@@ -111,7 +116,7 @@ for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     fi
 done
 
-# Step 7: Check Service Status
+# Step 9: Check Service Status
 echo -e "${BLUE}🔹 Checking service status...${RESET}"
 services=(wazuh-manager wazuh-indexer wazuh-dashboard)
 status_line=""
@@ -125,15 +130,15 @@ for service in "${services[@]}"; do
 done
 echo -e "🚀 **Service Status:** ${status_line% | }"
 
-# Step 8: Final Warning Before Reboot
+# Step 10: Final Warning Before Reboot
 echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
 echo -e "🌐 Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 User: admin"
-echo -e "🔒 Password: admin"
+echo -e "🔒 Password: Adm1n@123"
 
 # Cleanup: Remove the downloaded ZIP and extracted directory
 rm -rf /dxui.zip /dxui-main
-echo -e "${GREEN}✅ Cleanup completed! Downloaded packages and extracted contents removed.${RESET}"
+echo -e "${GREEN}✅ Cleanup completed!${RESET}"
 
 # Ask for user confirmation before rebooting
 echo -e "${YELLOW}${BOLD}⚠ WARNING: Do you want to reboot now? (y/n)${RESET}"
