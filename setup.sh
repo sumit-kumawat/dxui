@@ -35,15 +35,24 @@ fi
 
 echo -e "${BLUE}🔹 Starting user setup...${RESET}"
 
-# Step 3: Create 'admin' user with root privileges via sudo
+# Step 3: Create 'admin' user with root privileges via sudo or wheel
 if id "admin" &>/dev/null; then
     echo -e "${YELLOW}⚠ User 'admin' already exists. Skipping creation.${RESET}"
 else
     echo -e "${BLUE}🔹 Creating user 'admin'...${RESET}"
     useradd -m -s /bin/bash admin
     echo "admin:Adm1n@123" | chpasswd
-    usermod -aG sudo admin
-    echo -e "${GREEN}✅ User 'admin' created successfully with sudo privileges.${RESET}"
+
+    # Determine correct sudo group
+    if grep -q "^sudo:" /etc/group; then
+        usermod -aG sudo admin
+    elif grep -q "^wheel:" /etc/group; then
+        usermod -aG wheel admin
+    else
+        echo -e "${RED}❌ No sudo or wheel group found! Manual privilege setup required.${RESET}"
+    fi
+
+    echo -e "${GREEN}✅ User 'admin' created successfully with admin privileges.${RESET}"
 fi
 
 # Step 4: Ensure SSH access for 'admin'
