@@ -80,6 +80,43 @@ else
     echo -e "${YELLOW}⚠ 'wazuh-user' does not exist. Skipping ownership transfer.${RESET}"
 fi
 
+# Configuring Wazuh Dashboard Permissions
+### Change Ownership & Permissions for Wazuh Dashboard
+sudo chown -R admin:admin /usr/share/wazuh-dashboard
+sudo chmod -R 775 /usr/share/wazuh-dashboard
+
+### Allow Binding to Privileged Ports (Security Capability Settings)
+sudo setcap 'cap_net_bind_service=+ep' /usr/share/wazuh-dashboard/bin/opensearch-dashboards
+sudo setcap 'cap_net_bind_service=+ep' /usr/share/wazuh-dashboard/node/fallback/bin/node
+
+# Managing Custom Logo for Wazuh Dashboard
+### Ensure the Directory Exists
+sudo mkdir -p /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images
+
+### Set Proper Ownership & Permissions
+sudo chown -R admin:admin /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images
+sudo chmod -R 755 /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images
+sudo chown admin:admin /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+sudo chown -R admin:admin /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
+sudo chmod -R 755 /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
+
+### Creating a Custom Logo File (If Missing)
+sudo touch /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/customization.logo.app.svg
+sudo chown admin:admin /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/customization.logo.app.svg
+sudo chmod 664 /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/customization.logo.app.svg
+
+# Fix AxiosError: Permission Denied
+sudo mkdir -p /usr/share/wazuh-dashboard/data/wazuh/downloads
+sudo chown -R admin:admin /usr/share/wazuh-dashboard/data/wazuh/downloads
+sudo chmod -R 775 /usr/share/wazuh-dashboard/data/wazuh/downloads
+
+# Configuring Wazuh Configuration File
+sudo chown admin:admin /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+sudo chmod 644 /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+
+# Change Ownership of Additional Assets Directory
+sudo chown -R admin:admin /usr/share/wazuh-dashboard/src/core/server/core_app/assets/
+
 # Step 6: Replace Logos
 echo -e "${BLUE}🔹 Downloading and replacing DefendX logos...${RESET}"
 
