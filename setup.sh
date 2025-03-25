@@ -80,44 +80,55 @@ else
     echo -e "${YELLOW}⚠ 'wazuh-user' does not exist. Skipping ownership transfer.${RESET}"
 fi
 
-# Configuring Wazuh Dashboard Permissions
-### Change Ownership & Permissions for Wazuh Dashboard
+# Configuring Dashboard Permissions
+
+#Step 6: Change Ownership & Permissions for Dashboard
+echo -e "${BLUE}🔹 Changing Ownership & Permissions for Dashboard...${RESET}"
 sudo chown -R admin:admin /usr/share/wazuh-dashboard
 sudo chmod -R 775 /usr/share/wazuh-dashboard
+echo -e "${GREEN}✅ Changed Ownership & Permissions!${RESET}"
 
-### Allow Binding to Privileged Ports (Security Capability Settings)
+#Step 7: Allow Binding to Privileged Ports (Security Capability Settings)
+echo -e "${BLUE}🔹 Allow Binding to Privileged Ports (Security Capability Settings)...${RESET}"
 sudo setcap 'cap_net_bind_service=+ep' /usr/share/wazuh-dashboard/bin/opensearch-dashboards
 sudo setcap 'cap_net_bind_service=+ep' /usr/share/wazuh-dashboard/node/fallback/bin/node
+echo -e "${GREEN}✅ Completed Binding to Privileged Ports (Security Capability Settings)!${RESET}"
 
-# Managing Custom Logo for Wazuh Dashboard
+#Step 8: Managing Custom Logo for Dashboard
+echo -e "${BLUE}🔹 Managing Custom Logo for Dashboard...${RESET}"
 ### Ensure the Directory Exists
 sudo mkdir -p /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images
+echo -e "${GREEN}✅ Created Directory for Managing Custom Logo on Dashboard!${RESET}"
 
-### Set Proper Ownership & Permissions
-sudo chown -R admin:admin /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images
+#Step 9: Set Proper Ownership & Permissions
+echo -e "${BLUE}🔹 Setting-up Proper Assets Ownership & Permissions...${RESET}"
+sudo chown -R wazuh:wazuh /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images
 sudo chmod -R 755 /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images
-sudo chown admin:admin /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
-sudo chown -R admin:admin /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
+sudo chown -R wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
 sudo chmod -R 755 /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
+echo -e "${GREEN}✅ Changed Assets Ownership & Permissions!${RESET}"
 
-### Creating a Custom Logo File (If Missing)
+#Step 10: Creating a Custom Logo File (If Missing)
+echo -e "${BLUE}🔹 Checking and Creating a Custom Logo File (If Missing)...${RESET}"
 sudo touch /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/customization.logo.app.svg
-sudo chown admin:admin /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/customization.logo.app.svg
+sudo chown wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/customization.logo.app.svg
 sudo chmod 664 /usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/customization.logo.app.svg
+echo -e "${GREEN}✅ Checked and Created Custom Logo File Successfully!${RESET}"
 
-# Fix AxiosError: Permission Denied
+#Step 11: Fix AxiosError: Permission Denied
+echo -e "${BLUE}🔹 Checking for AxiosError: Permission Denied...${RESET}"
 sudo mkdir -p /usr/share/wazuh-dashboard/data/wazuh/downloads
-sudo chown -R admin:admin /usr/share/wazuh-dashboard/data/wazuh/downloads
+sudo chown -R wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/data/wazuh/downloads
 sudo chmod -R 775 /usr/share/wazuh-dashboard/data/wazuh/downloads
+echo -e "${GREEN}✅ Fixed AxiosError: Permission Granted!${RESET}"
 
-# Configuring Wazuh Configuration File
-sudo chown admin:admin /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+#Step 12: Configuring Configuration File
+echo -e "${BLUE}🔹 Setting Configuring Configuration File...${RESET}"
+sudo chown wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 sudo chmod 644 /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+echo -e "${GREEN}✅ Configuration File Updated!${RESET}"
 
-# Change Ownership of Additional Assets Directory
-sudo chown -R admin:admin /usr/share/wazuh-dashboard/src/core/server/core_app/assets/
-
-# Step 6: Replace Logos
+# Step 13: Replace Logos
 echo -e "${BLUE}🔹 Downloading and replacing DefendX logos...${RESET}"
 
 LOGO_URL="https://cdn.conzex.com/uploads/Defendx-Assets/Wazuh-assets/30e500f584235c2912f16c790345f966.svg"
@@ -136,7 +147,7 @@ else
     exit 1
 fi
 
-# Step 7: Update SSH console Branding
+# Step 14: Update SSH console Branding
 echo -e "${BLUE}🔹 Updating SSH console with DefendX branding...${RESET}"
 cat << EOL > /etc/issue
 Welcome to DefendX – Unified XDR & SIEM
@@ -160,7 +171,7 @@ for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     fi
 done
 
-# Step 9: Check Service Status
+# Step 15: Check Service Status
 echo -e "${BLUE}🔹 Checking service status...${RESET}"
 services=(wazuh-manager wazuh-indexer wazuh-dashboard)
 status_line=""
@@ -174,13 +185,14 @@ for service in "${services[@]}"; do
 done
 echo -e "🚀 **Service Status:** ${status_line% | }"
 
-# Step 10: Final Warning Before Reboot
+# Step 16: Final Warning Before Reboot
 echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
 echo -e "🌐 Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 User: admin"
 echo -e "🔒 Password: admin"
 
 # Cleanup: Remove the downloaded ZIP and extracted directory
+cd..
 rm -rf /dxui.zip /dxui-main
 echo -e "${GREEN}✅ Cleanup completed!${RESET}"
 
