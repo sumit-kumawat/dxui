@@ -159,7 +159,7 @@ _______________________________________________________________________
 EOL
 echo -e "${GREEN}✅ SSH console updated successfully!${RESET}"
 
-# Step 8: Restart Wazuh Services
+# Step 15: Restart Wazuh Services
 echo -e "${BLUE}🔹 Restarting Wazuh Services...${RESET}"
 for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     systemctl restart $service
@@ -171,7 +171,7 @@ for service in wazuh-manager wazuh-indexer wazuh-dashboard; do
     fi
 done
 
-# Step 15: Check Service Status
+# Step 16: Check Service Status
 echo -e "${BLUE}🔹 Checking service status...${RESET}"
 services=(wazuh-manager wazuh-indexer wazuh-dashboard)
 status_line=""
@@ -185,18 +185,17 @@ for service in "${services[@]}"; do
 done
 echo -e "🚀 **Service Status:** ${status_line% | }"
 
-# Step 16: Final Warning Before Reboot
+#Step 17: Cleanup: Remove the downloaded ZIP and extracted directory
+rm -rf /dxui.zip /dxui-main
+echo -e "${GREEN}✅ Cleanup completed!${RESET}"
+
+# Step 18: Final Warning Before Reboot
 echo -e "${GREEN}${BOLD}✅ DefendX setup completed successfully!${RESET}"
 echo -e "🌐 Login: https://$(hostname -I | awk '{print $1}')"
 echo -e "👤 User: admin"
 echo -e "🔒 Password: admin"
 
-# Cleanup: Remove the downloaded ZIP and extracted directory
-cd..
-rm -rf /dxui.zip /dxui-main
-echo -e "${GREEN}✅ Cleanup completed!${RESET}"
-
-# Ask for user confirmation before rebooting
+#Step 19: Ask for user confirmation before rebooting
 echo -e "${YELLOW}${BOLD}⚠ WARNING: Do you want to reboot now? (y/n)${RESET}"
 read -r response
 
