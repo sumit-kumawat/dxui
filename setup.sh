@@ -130,13 +130,11 @@ if [[ ! -d "$TARGET_DIR" ]]; then
 fi
 
 if curl -o "$LOGO_PATH" -L "$LOGO_URL" --silent --fail; then
-    echo -e "${GREEN}✅ Successfully replaced!${RESET}"
+    echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
 else
     echo -e "${RED}✖ Failed to download logo from $LOGO_URL${RESET}"
     exit 1
 fi
-
-echo -e "${GREEN}✅ Logo replacement completed!${RESET}"
 
 # Step 7: Update SSH console Branding
 echo -e "${BLUE}🔹 Updating SSH console with DefendX branding...${RESET}"
