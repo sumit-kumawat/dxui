@@ -186,7 +186,8 @@ done
 echo -e "🚀 **Service Status:** ${status_line% | }"
 
 #Step 17: Cleanup: Remove the downloaded ZIP and extracted directory
-rm -rf /dxui.zip /dxui-main
+echo -e "${BLUE}🔹 Cleaning up temporary files...${RESET}"
+cd / && rm -rf dxui-main dxui.zip
 echo -e "${GREEN}✅ Cleanup completed!${RESET}"
 
 # Step 18: Final Warning Before Reboot
