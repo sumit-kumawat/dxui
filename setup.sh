@@ -131,7 +131,7 @@ echo -e "${GREEN}✅ Configuration File Updated!${RESET}"
 # Step 13: Replace Logos
 echo -e "${BLUE}🔹 Downloading and replacing DefendX logos...${RESET}"
 
-LOGO_URL="https://cdn.conzex.com/media/image/BootLogo.png"
+LOGO_URL="https://cdn.conzex.com/media/image/dx-full-dark.png"
 LOGO_PATH="/usr/share/wazuh-dashboard/plugins/securityDashboards/target/public/30e500f584235c2912f16c790345f966.svg"
 
 TARGET_DIR=$(dirname "$LOGO_PATH")
